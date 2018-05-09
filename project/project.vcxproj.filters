@@ -17,7 +17,7 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <None Include="..\file\進度.xlsx">
+    <None Include="..\進度.md">
       <Filter>file</Filter>
     </None>
   </ItemGroup>
