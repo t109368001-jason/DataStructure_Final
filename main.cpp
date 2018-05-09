@@ -10,9 +10,9 @@
 #include <pcl/surface/gp3.h>
 #include<Windows.h>    
 #include<stdio.h>    
-#include<gl/GL.h>   // GL.h header file    
-#include<gl/GLU.h> // GLU.h header file    
-#include<gl/glut.h>  // glut.h header file from freeglut\include\GL folder    
+#include<gl/GL.h>  
+#include<gl/GLU.h> 
+#include<gl/glut.h>
 #include<conio.h>    
 #include<stdio.h>    
 #include<math.h>    
@@ -44,7 +44,7 @@ void RenderScene(void)
 	glColor3f(1.0, 1.0, 1.0);
 
 	glLineWidth(1.0);
-	
+
 	pcl::PointCloud<pcl::PointXYZ> *x = cloud.get();
 	for (size_t i = 0; i < triangles.polygons.size() - 1; ++i)
 	{
@@ -65,12 +65,12 @@ void RenderScene(void)
 	pcl::PointCloud<pcl::PointXYZ> *x = cloud.get();
 	for (size_t i = 0; i < x->points.size(); ++i)
 	{
-		glBegin(GL_POINTS);
+	glBegin(GL_POINTS);
 
-		glVertex3f(x->points[i].x * scaleD, x->points[i].y * scaleD, x->points[i].z * scaleD);
-		glEnd();
+	glVertex3f(x->points[i].x * scaleD, x->points[i].y * scaleD, x->points[i].z * scaleD);
+	glEnd();
 	}*/
-	
+
 	glPopMatrix();
 
 	glutSwapBuffers();
@@ -86,18 +86,18 @@ void SetupRC()
 }
 void Keyboard(unsigned char key, int x, int y)
 {
-	switch (key) 
+	switch (key)
 	{
 	case 'w':	zRot -= 5.0f;	break;
 	case 's':	zRot += 5.0f;	break;
 		/*
-	case 'j': d[0] += 0.1;  break;
-	case 'k': d[1] += 0.1;  break;
-	case 'l': d[2] += 0.1;  break;
+		case 'j': d[0] += 0.1;  break;
+		case 'k': d[1] += 0.1;  break;
+		case 'l': d[2] += 0.1;  break;
 
-	case 'x': xAngle += 5;  break;
-	case 'y': yAngle += 5;  break;
-	case 'z': zAngle += 5;  break;*/
+		case 'x': xAngle += 5;  break;
+		case 'y': yAngle += 5;  break;
+		case 'z': zAngle += 5;  break;*/
 
 	default: printf("   Keyboard %c == %d\n", key, key);
 
@@ -175,7 +175,7 @@ int main(int argc, char* argv[])
 	{
 		centroid.add(x->points[i]);
 	}
-	
+
 	// Normal estimation*
 	pcl::NormalEstimation<pcl::PointXYZ, pcl::Normal> n;
 	pcl::PointCloud<pcl::Normal>::Ptr normals(new pcl::PointCloud<pcl::Normal>);
@@ -216,8 +216,6 @@ int main(int argc, char* argv[])
 	gp3.reconstruct(triangles);
 
 	//////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-	///////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	GLenum type;
 
 	glutInit(&argc, argv);
@@ -231,7 +229,6 @@ int main(int argc, char* argv[])
 	SetupRC();
 	glutMainLoop();
 	return 0;
-	//Jeff Chastine
 }
 /////////////////////////////////////////////////////////////
 #ifdef xx
