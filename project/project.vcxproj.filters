@@ -1,24 +1,17 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
+    <ClCompile Include="..\main.cpp" />
+  </ItemGroup>
+  <ItemGroup>
     <CustomBuild Include="C:\Users\XIAO\Documents\c\DataStructure_Final\CMakeLists.txt" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Source Files">
       <UniqueIdentifier>{9D94051C-2F78-3AE0-9E34-142616C8F7FA}</UniqueIdentifier>
     </Filter>
-    <Filter Include="file">
-      <UniqueIdentifier>{b884e352-e471-433f-ada3-3eebfa940ff8}</UniqueIdentifier>
-    </Filter>
   </ItemGroup>
   <ItemGroup>
-    <None Include="..\進度.md">
-      <Filter>file</Filter>
-    </None>
-  </ItemGroup>
-  <ItemGroup>
-    <ClCompile Include="..\main.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
+    <None Include="..\進度.md" />
   </ItemGroup>
 </Project>

@@ -82,20 +82,20 @@
     <GenerateManifest Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">true</GenerateManifest>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <IncludePath>C:\Users\XIAO\Documents\c\DataStructure_Final\include;$(IncludePath)</IncludePath>
-    <LibraryPath>C:\Users\XIAO\Documents\c\DataStructure_Final\lib;$(LibraryPath)</LibraryPath>
+    <IncludePath>..\include;$(IncludePath)</IncludePath>
+    <LibraryPath>..\lib;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">
-    <IncludePath>C:\Users\XIAO\Documents\c\DataStructure_Final\include;$(IncludePath)</IncludePath>
-    <LibraryPath>C:\Users\XIAO\Documents\c\DataStructure_Final\lib;$(LibraryPath)</LibraryPath>
+    <IncludePath>..\include;$(IncludePath)</IncludePath>
+    <LibraryPath>..\lib;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-    <IncludePath>C:\Users\XIAO\Documents\c\DataStructure_Final\include;$(IncludePath)</IncludePath>
-    <LibraryPath>C:\Users\XIAO\Documents\c\DataStructure_Final\lib;$(LibraryPath)</LibraryPath>
+    <IncludePath>..\include;$(IncludePath)</IncludePath>
+    <LibraryPath>..\lib;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">
-    <IncludePath>C:\Users\XIAO\Documents\c\DataStructure_Final\include;$(IncludePath)</IncludePath>
-    <LibraryPath>C:\Users\XIAO\Documents\c\DataStructure_Final\lib;$(LibraryPath)</LibraryPath>
+    <IncludePath>..\include;$(IncludePath)</IncludePath>
+    <LibraryPath>..\lib;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
