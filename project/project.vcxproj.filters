@@ -1,11 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
-    <ClCompile Include="C:\Users\XIAO\Documents\c\DataStructure_Final\main.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-  </ItemGroup>
-  <ItemGroup>
     <CustomBuild Include="C:\Users\XIAO\Documents\c\DataStructure_Final\CMakeLists.txt" />
   </ItemGroup>
   <ItemGroup>
@@ -20,5 +15,10 @@
     <None Include="..\進度.md">
       <Filter>file</Filter>
     </None>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\main.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

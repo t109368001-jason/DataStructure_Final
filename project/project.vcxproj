@@ -81,6 +81,22 @@
     <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">true</LinkIncremental>
     <GenerateManifest Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">true</GenerateManifest>
   </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <IncludePath>C:\Users\XIAO\Documents\c\DataStructure_Final\include;$(IncludePath)</IncludePath>
+    <LibraryPath>C:\Users\XIAO\Documents\c\DataStructure_Final\lib;$(LibraryPath)</LibraryPath>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">
+    <IncludePath>C:\Users\XIAO\Documents\c\DataStructure_Final\include;$(IncludePath)</IncludePath>
+    <LibraryPath>C:\Users\XIAO\Documents\c\DataStructure_Final\lib;$(LibraryPath)</LibraryPath>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <IncludePath>C:\Users\XIAO\Documents\c\DataStructure_Final\include;$(IncludePath)</IncludePath>
+    <LibraryPath>C:\Users\XIAO\Documents\c\DataStructure_Final\lib;$(LibraryPath)</LibraryPath>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">
+    <IncludePath>C:\Users\XIAO\Documents\c\DataStructure_Final\include;$(IncludePath)</IncludePath>
+    <LibraryPath>C:\Users\XIAO\Documents\c\DataStructure_Final\lib;$(LibraryPath)</LibraryPath>
+  </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
       <AdditionalIncludeDirectories>C:\Program Files\PCL 1.8.1\3rdParty\VTK\include\vtk-8.0;C:\Program Files\PCL 1.8.1\include\pcl-1.8;C:\Program Files\PCL 1.8.1\3rdParty\Eigen\eigen3;C:\Program Files\PCL 1.8.1\3rdParty\Boost\include\boost-1_64;C:\Program Files\OpenNI2\Include;C:\Program Files\PCL 1.8.1\3rdParty\FLANN\include;C:\Program Files\PCL 1.8.1\3rdParty\Qhull\include;C:\Program Files\PCL 1.8.1\3rdParty\VTK\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
@@ -309,9 +325,6 @@ if %errorlevel% neq 0 goto :VCEnd</Command>
     </CustomBuild>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="C:\Users\XIAO\Documents\c\DataStructure_Final\main.cpp" />
-  </ItemGroup>
-  <ItemGroup>
     <ProjectReference Include="C:\Users\XIAO\Documents\c\DataStructure_Final\project\ZERO_CHECK.vcxproj">
       <Project>{BA00DC37-58E6-3E92-B257-CF105D59547D}</Project>
       <Name>ZERO_CHECK</Name>
@@ -319,6 +332,9 @@ if %errorlevel% neq 0 goto :VCEnd</Command>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\進度.md" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\main.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
