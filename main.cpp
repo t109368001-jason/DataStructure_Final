@@ -90,16 +90,8 @@ void Keyboard(unsigned char key, int x, int y)
 	{
 	case 'w':	zRot -= 5.0f;	break;
 	case 's':	zRot += 5.0f;	break;
-		/*
-		case 'j': d[0] += 0.1;  break;
-		case 'k': d[1] += 0.1;  break;
-		case 'l': d[2] += 0.1;  break;
 
-		case 'x': xAngle += 5;  break;
-		case 'y': yAngle += 5;  break;
-		case 'z': zAngle += 5;  break;*/
-
-	default: printf("   Keyboard %c == %d\n", key, key);
+	default: printf("   Keyboard %c == %d\n", key, key);	break;
 
 	}
 
