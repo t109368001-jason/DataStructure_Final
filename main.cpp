@@ -23,11 +23,11 @@ pcl::PolygonMesh triangles;
 
 pcl::CentroidPoint<pcl::PointXYZ> centroid;
 
-static GLfloat xRot = 45.0f;
-static GLfloat yRot = 45.0f;
-static GLfloat zRot = 45.0f;
+static GLfloat xRot = 0.0f;
+static GLfloat yRot = 0.0f;
+static GLfloat zRot = 0.0f;
 
-void RenderScene(void)
+void Display(void)
 {
 	//²M°£
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -217,7 +217,7 @@ int main(int argc, char* argv[])
 	glutReshapeFunc(ChangeSize);
 	glutKeyboardFunc(Keyboard);
 	glutSpecialFunc(SpecialKeys);
-	glutDisplayFunc(RenderScene);
+	glutDisplayFunc(Display);
 	SetupRC();
 	glutMainLoop();
 	return 0;
