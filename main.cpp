@@ -8,24 +8,24 @@
 #include <pcl/kdtree/kdtree_flann.h>
 #include <pcl/features/normal_3d.h>
 #include <pcl/surface/gp3.h>
-#include<Windows.h>    
-#include<stdio.h>    
-#include<gl/GL.h>  
-#include<gl/GLU.h> 
-#include<gl/glut.h>
-#include<conio.h>    
-#include<stdio.h>    
-#include<math.h>    
-#include<string.h>    
+#include <Windows.h>    
+#include <stdio.h>    
+#include <gl/GL.h>  
+#include <gl/GLU.h> 
+#include <gl/glut.h>
+#include <conio.h>    
+#include <stdio.h>    
+#include <math.h>    
+#include <string.h>    
 
 pcl::PointCloud<pcl::PointXYZ>::Ptr cloud(new pcl::PointCloud<pcl::PointXYZ>);
 pcl::PolygonMesh triangles;
 
 pcl::CentroidPoint<pcl::PointXYZ> centroid;
 
-static GLfloat xRot = 0.0f;
-static GLfloat yRot = 0.0f;
-static GLfloat zRot = 0.0f;
+static GLfloat xRot = 0.0f;					//camera X идл╫
+static GLfloat yRot = 0.0f;					//camera Y идл╫
+static GLfloat zRot = 0.0f;					//camera Z идл╫
 
 void Display(void)
 {
@@ -159,7 +159,7 @@ int main(int argc, char* argv[])
 {
 	// Load input file into a PointCloud<T> with an appropriate type
 	pcl::PCLPointCloud2 cloud_blob;
-	pcl::io::loadPCDFile("bunny.pcd", cloud_blob);
+	pcl::io::loadPCDFile("../file/bunny.pcd", cloud_blob);
 	pcl::fromPCLPointCloud2(cloud_blob, *cloud);
 	//* the data should be available in cloud
 	pcl::PointCloud<pcl::PointXYZ> *x = cloud.get();

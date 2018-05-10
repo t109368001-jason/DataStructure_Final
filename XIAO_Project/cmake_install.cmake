@@ -40,5 +40,5 @@ endif()
 
 string(REPLACE ";" "\n" CMAKE_INSTALL_MANIFEST_CONTENT
        "${CMAKE_INSTALL_MANIFEST_FILES}")
-file(WRITE "C:/Users/XIAO/Documents/c/DataStructure_Final/project/${CMAKE_INSTALL_MANIFEST}"
+file(WRITE "C:/Users/XIAO/Documents/c/DataStructure_Final/XIAO_Project/${CMAKE_INSTALL_MANIFEST}"
      "${CMAKE_INSTALL_MANIFEST_CONTENT}")
