@@ -23,7 +23,7 @@ if( PCL_FOUND )
   # Additional Library Directories
   # [Linker][General][Additional Library Directories]
   link_directories( ${PCL_LIBRARY_DIRS} )
-  link_directories( lib )
+ 
  
   # Additional Dependencies
   # [Linker][Input][Additional Dependencies]

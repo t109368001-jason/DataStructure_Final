@@ -13,7 +13,4 @@
       <UniqueIdentifier>{5463C2E1-30F0-3A2C-90C1-0037D2924EE7}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
-  <ItemGroup>
-    <None Include="..\file\進度.md" />
-  </ItemGroup>
 </Project>
