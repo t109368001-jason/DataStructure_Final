@@ -18,6 +18,8 @@
 #include <math.h>    
 #include <string.h>    
 
+#define MOVE_SPEED 0.05f
+
 pcl::PointCloud<pcl::PointXYZ>::Ptr cloud(new pcl::PointCloud<pcl::PointXYZ>);
 pcl::PolygonMesh triangles;
 
@@ -26,6 +28,7 @@ pcl::CentroidPoint<pcl::PointXYZ> centroid;
 GLfloat xRot = 0.0f;					//camera X 角度
 GLfloat yRot = 0.0f;					//camera Y 角度
 GLfloat zRot = 0.0f;					//camera Z 角度
+
 float angle = 0.0;
 float angle2 = M_PI_2;
 // actual vector representing the camera's direction
@@ -141,7 +144,8 @@ void mouseMove(int x, int y) {
 }
 void Keyboard(unsigned char key, int x, int y)
 {
-	float fraction = 0.1f;
+	float fraction = MOVE_SPEED;
+	float tempx = cx, tempz = cz;
 	switch (key)
 	{
 	case 'w':
@@ -155,16 +159,18 @@ void Keyboard(unsigned char key, int x, int y)
 		cy -= ly * fraction;
 		break;
 	case 'a':
-		angle -= 0.1f;
-		lz = -sin(angle2)*cos(angle);
-		lx = sin(angle2)*sin(angle);
-		ly = -cos(angle2);
+		fraction = fmax(fabs(cx), fabs(cz)) / fraction;
+		cout << "cx += " << -tempz / fraction << endl;
+		cout << "cz += " << tempx / fraction << endl;
+		cx += -tempz / fraction;
+		cz += tempx / fraction;
 		break;
 	case 'd':
-		angle += 0.1f;
-		lz = -sin(angle2)*cos(angle);
-		lx = sin(angle2)*sin(angle);
-		ly = -cos(angle2);
+		fraction = fmax(fabs(cx), fabs(cz)) / fraction;
+		cout << "cx -= " << -tempz / fraction << endl;
+		cout << "cz -= " << tempx / fraction << endl;
+		cx -= -tempz / fraction;
+		cz -= tempx / fraction;
 		break;
 
 	default: printf("   Keyboard %c == %d\n", key, key);	break;
@@ -177,8 +183,16 @@ void SpecialKeys(int key, int x, int y)
 	switch (key)
 	{
 	case GLUT_KEY_LEFT:
+		angle -= 0.1f;
+		lz = -sin(angle2)*cos(angle);
+		lx = sin(angle2)*sin(angle);
+		ly = -cos(angle2);
 		break;
 	case GLUT_KEY_RIGHT:
+		angle += 0.1f;
+		lz = -sin(angle2)*cos(angle);
+		lx = sin(angle2)*sin(angle);
+		ly = -cos(angle2);
 		break;
 	case GLUT_KEY_UP:
 		if (angle2 < (M_PI - 0.1))
