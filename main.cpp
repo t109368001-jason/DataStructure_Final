@@ -1,4 +1,4 @@
-#include <pcl/visualization/cloud_viewer.h>
+Ôªø#include <pcl/visualization/cloud_viewer.h>
 #include <iostream>
 #include <pcl/io/io.h>
 #include <pcl/io/pcd_io.h>
@@ -23,27 +23,44 @@ pcl::PolygonMesh triangles;
 
 pcl::CentroidPoint<pcl::PointXYZ> centroid;
 
-static GLfloat xRot = 0.0f;					//camera X ®§´◊
-static GLfloat yRot = 0.0f;					//camera Y ®§´◊
-static GLfloat zRot = 0.0f;					//camera Z ®§´◊
+GLfloat xRot = 0.0f;					//camera X ËßíÂ∫¶
+GLfloat yRot = 0.0f;					//camera Y ËßíÂ∫¶
+GLfloat zRot = 0.0f;					//camera Z ËßíÂ∫¶
+float angle = 0.0;
+float angle2 = M_PI_2;
+// actual vector representing the camera's direction
+float lx = 0.0f, lz = -1.0f, ly = 0.0;
+// XZ position of the camera
+float cx = 0.0f, cz = 5.0f, cy = 0.0f;
+
+int xOrigin = -1;
 
 void Display(void)
 {
-	//≤M∞£
+	//Ê∏ÖÈô§
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-	//´O¶sØx∞} 
+	//‰øùÂ≠òÁü©Èô£ 
 	glPushMatrix();
 
-	//±€¬‡ 
-	glRotatef(xRot, 1.0f, 0.0f, 0.0f);
-	glRotatef(yRot, 0.0f, 1.0f, 0.0f);
+	glColor3f(1.0, 1.0, 1.0);
+	glPointSize(1.0);
+	glLineWidth(1.0);
+
+	glLoadIdentity();
+
+	gluLookAt(cx, cy, cz,
+		cx + lx, cy + ly, cz + lz,
+		0.0f, 1.0f, 0.0f);
+	cout << "cx=" << cx << "cy=" << cy << "cz=" << cz << "lx=" << lx << "ly=" << ly << "lz=" << lz << endl;
+	/*
+	//ÊóãËΩâ 
+	glRotatef(xRot, 0.0f, 1.0f, 0.0f);
+	glRotatef(yRot, 1.0f, 0.0f, 0.0f);
 	glRotatef(zRot, 0.0f, 0.0f, 1.0f);
 
-	glPointSize(1.0);
-	glColor3f(1.0, 1.0, 1.0);
-
-	glLineWidth(1.0);
+	glutWireTeapot(2);
+	*/
 
 	pcl::PointCloud<pcl::PointXYZ> *x = cloud.get();
 	for (size_t i = 0; i < triangles.polygons.size() - 1; ++i)
@@ -61,6 +78,12 @@ void Display(void)
 		glVertex3f(x->points[triangles.polygons[i].vertices[2]].x, x->points[triangles.polygons[i].vertices[2]].y, x->points[triangles.polygons[i].vertices[2]].z);
 		glEnd();
 	}
+	glPointSize(1);
+	glBegin(GL_POINTS);
+	glColor3f(1.0, 0.0, 0.0);
+	glVertex3f(0.0, 0.0, 0.0);
+	glEnd();
+	
 	/*
 	pcl::PointCloud<pcl::PointXYZ> *x = cloud.get();
 	for (size_t i = 0; i < x->points.size(); ++i)
@@ -84,53 +107,93 @@ void SetupRC()
 	glEnable(GL_DITHER);
 	glShadeModel(GL_SMOOTH);
 }
+void Mouse(int button, int state, int x, int y)
+{
+	// only start motion if the left button is pressed
+	if (button == GLUT_LEFT_BUTTON) {
+
+		// when the button is released
+		if (state == GLUT_UP) {
+			xOrigin = -1;
+		}
+		else {// state = GLUT_DOWN
+			xOrigin = x;
+		}
+		cout << "Mouse click x=" << x << " y=" << y << endl;
+	}
+	//glutPostRedisplay();
+}
+void mouseMove(int x, int y) {
+
+	// this will only be true when the left button is down
+	/*if (xOrigin >= 0) {
+
+		// update deltaAngle
+		deltaAngle = (x - xOrigin) * 0.001f;
+
+		// update camera's direction
+		lx = sin(angle + deltaAngle);
+		lz = -cos(angle + deltaAngle);
+	}*/
+}
 void Keyboard(unsigned char key, int x, int y)
 {
+	float fraction = 0.1f;
 	switch (key)
 	{
-	case 'w':	zRot -= 5.0f;	break;
-	case 's':	zRot += 5.0f;	break;
+	case 'w':
+		cx += lx * fraction;
+		cz += lz * fraction;
+		cy += ly * fraction;
+		break;
+	case 's':
+		cx -= lx * fraction;
+		cz -= lz * fraction;
+		cy -= ly * fraction;
+		break;
+	case 'a':
+		angle -= 0.1f;
+		cout << "angle = " << angle << endl;
+		lz = -sin(angle2)*cos(angle);
+		lx = sin(angle2)*sin(angle);
+		ly = -cos(angle2);
+		break;
+	case 'd':
+		angle += 0.1f;
+		lz = -sin(angle2)*cos(angle);
+		lx = sin(angle2)*sin(angle);
+		ly = -cos(angle2);
+		break;
 
 	default: printf("   Keyboard %c == %d\n", key, key);	break;
 
 	}
-
 	glutPostRedisplay();
 }
-
 void SpecialKeys(int key, int x, int y)
 {
-	if (key == GLUT_KEY_UP)
-		xRot -= 5.0f;
-
-	if (key == GLUT_KEY_DOWN)
-		xRot += 5.0f;
-
-	if (key == GLUT_KEY_LEFT)
-		yRot -= 5.0f;
-
-	if (key == GLUT_KEY_RIGHT)
-		yRot += 5.0f;
-
-	if (key == GLUT_KEY_PAGE_UP)
-		glScalef(1.25, 1.25, 1.25);
-
-	if (key == GLUT_KEY_PAGE_DOWN)
-		glScalef(0.8, 0.8, 0.8);
-
-	if (key > 356.0f)
-		xRot = 0.0f;
-
-	if (key < -1.0f)
-		xRot = 355.0f;
-
-	if (key > 356.0f)
-		yRot = 0.0f;
-
-	if (key < -1.0f)
-		yRot = 355.0f;
-
-	// Refresh the Window
+	switch (key)
+	{
+	case GLUT_KEY_LEFT:
+		break;
+	case GLUT_KEY_RIGHT:
+		break;
+	case GLUT_KEY_UP:
+		if (angle2 < (M_PI - 0.1))
+			angle2 += 0.1f;
+		lz = -sin(angle2)*cos(angle);
+		lx = sin(angle2)*sin(angle);
+		ly = -cos(angle2);
+		break;
+		break;
+	case GLUT_KEY_DOWN:
+		if (angle2 > 0.1)
+			angle2 -= 0.1f;
+		lz = -sin(angle2)*cos(angle);
+		lx = sin(angle2)*sin(angle);
+		ly = -cos(angle2);
+		break;
+	}
 	glutPostRedisplay();
 }
 
@@ -143,17 +206,13 @@ void ChangeSize(int w, int h)
 
 	if (h == 0)
 		h = 1;
-
-	glViewport(0, 0, w, h);
+	glViewport(0, 0, (GLsizei)w, (GLsizei)h);
 	glMatrixMode(GL_PROJECTION);
 	glLoadIdentity();
-
-	fAspect = (GLfloat)w / (GLfloat)h;
-	gluPerspective(35.0f, fAspect, 1.0f, 1000.0f);
-	//glOrtho(-400+x.x, 400-x.x, -400+x.y, 400-x.y, 1, 0);
+	gluPerspective(60.0, (GLfloat)w / (GLfloat)h, 1.0, 20.0);
 	glMatrixMode(GL_MODELVIEW);
 	glLoadIdentity();
-	glTranslatef(0.0f, 0.0f, -1000.0f);
+	gluLookAt(0.0, 0.0, 5.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0);
 }
 int main(int argc, char* argv[])
 {
@@ -216,6 +275,8 @@ int main(int argc, char* argv[])
 	glutCreateWindow("RGB Cube");
 	glutReshapeFunc(ChangeSize);
 	glutKeyboardFunc(Keyboard);
+	glutMouseFunc(Mouse);
+	glutMotionFunc(mouseMove);
 	glutSpecialFunc(SpecialKeys);
 	glutDisplayFunc(Display);
 	SetupRC();
