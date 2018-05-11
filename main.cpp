@@ -180,11 +180,11 @@ void mouseMove(int x, int y)
 
 	xClick = x;
 	yClick = y;
-	lookTheta += deltaTheta;
+	lookTheta -= deltaTheta;
 	lookPhi -= deltaPhi;
 	zLook = -sin(lookTheta)*cos(lookPhi);
 	xLook = sin(lookTheta)*sin(lookPhi);
-	yLook = -cos(lookTheta);
+	yLook = cos(lookTheta);
 }
 void Keyboard(unsigned char key, int x, int y)
 {
@@ -230,28 +230,28 @@ void SpecialKeys(int key, int x, int y)
 		lookPhi -= 0.1f;
 		zLook = -sin(lookTheta)*cos(lookPhi);
 		xLook = sin(lookTheta)*sin(lookPhi);
-		yLook = -cos(lookTheta);
+		yLook = cos(lookTheta);
 		break;
 	case GLUT_KEY_RIGHT:
 		lookPhi += 0.1f;
 		zLook = -sin(lookTheta)*cos(lookPhi);
 		xLook = sin(lookTheta)*sin(lookPhi);
-		yLook = -cos(lookTheta);
+		yLook = cos(lookTheta);
 		break;
 	case GLUT_KEY_UP:
 		if (lookTheta < (M_PI - 0.1))
-			lookTheta += 0.1f;
+			lookTheta -= 0.1f;
 		zLook = -sin(lookTheta)*cos(lookPhi);
 		xLook = sin(lookTheta)*sin(lookPhi);
-		yLook = -cos(lookTheta);
+		yLook = cos(lookTheta);
 		break;
 		break;
 	case GLUT_KEY_DOWN:
 		if (lookTheta > 0.1)
-			lookTheta -= 0.1f;
+			lookTheta += 0.1f;
 		zLook = -sin(lookTheta)*cos(lookPhi);
 		xLook = sin(lookTheta)*sin(lookPhi);
-		yLook = -cos(lookTheta);
+		yLook = cos(lookTheta);
 		break;
 	}
 	glutPostRedisplay();
