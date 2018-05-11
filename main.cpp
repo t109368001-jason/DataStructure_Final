@@ -34,7 +34,16 @@ float lx = 0.0f, lz = -1.0f, ly = 0.0;
 float cx = 0.0f, cz = 5.0f, cy = 0.0f;
 
 int xOrigin = -1;
+void output(float x, float y,float z, char *string)
+{
+	int len, i;
 
+	glRasterPos3f(x, y ,z);
+	len = (int)strlen(string);
+	for (i = 0; i < len; i++) {
+		glutBitmapCharacter(GLUT_BITMAP_TIMES_ROMAN_24, string[i]);
+	}
+}
 void Display(void)
 {
 	//清除
@@ -52,7 +61,6 @@ void Display(void)
 	gluLookAt(cx, cy, cz,
 		cx + lx, cy + ly, cz + lz,
 		0.0f, 1.0f, 0.0f);
-	cout << "cx=" << cx << "cy=" << cy << "cz=" << cz << "lx=" << lx << "ly=" << ly << "lz=" << lz << endl;
 	/*
 	//旋轉 
 	glRotatef(xRot, 0.0f, 1.0f, 0.0f);
@@ -78,12 +86,7 @@ void Display(void)
 		glVertex3f(x->points[triangles.polygons[i].vertices[2]].x, x->points[triangles.polygons[i].vertices[2]].y, x->points[triangles.polygons[i].vertices[2]].z);
 		glEnd();
 	}
-	glPointSize(1);
-	glBegin(GL_POINTS);
-	glColor3f(1.0, 0.0, 0.0);
-	glVertex3f(0.0, 0.0, 0.0);
-	glEnd();
-	
+	//output(cx + lx*10, cy + ly*10, cz + lz*10,"xxxx");
 	/*
 	pcl::PointCloud<pcl::PointXYZ> *x = cloud.get();
 	for (size_t i = 0; i < x->points.size(); ++i)
@@ -153,7 +156,6 @@ void Keyboard(unsigned char key, int x, int y)
 		break;
 	case 'a':
 		angle -= 0.1f;
-		cout << "angle = " << angle << endl;
 		lz = -sin(angle2)*cos(angle);
 		lx = sin(angle2)*sin(angle);
 		ly = -cos(angle2);
@@ -209,7 +211,7 @@ void ChangeSize(int w, int h)
 	glViewport(0, 0, (GLsizei)w, (GLsizei)h);
 	glMatrixMode(GL_PROJECTION);
 	glLoadIdentity();
-	gluPerspective(60.0, (GLfloat)w / (GLfloat)h, 1.0, 20.0);
+	gluPerspective(60.0, (GLfloat)w / (GLfloat)h, 0.001, 20.0);
 	glMatrixMode(GL_MODELVIEW);
 	glLoadIdentity();
 	gluLookAt(0.0, 0.0, 5.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0);
@@ -267,8 +269,6 @@ int main(int argc, char* argv[])
 	gp3.reconstruct(triangles);
 
 	//////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	GLenum type;
-
 	glutInit(&argc, argv);
 	glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB | GLUT_DEPTH);
 	glutInitWindowSize(800, 800);
