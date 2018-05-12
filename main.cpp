@@ -1,25 +1,24 @@
-﻿#include <pcl/visualization/cloud_viewer.h>
-#include <iostream>
+﻿#include <iostream>
 #include <pcl/io/io.h>
 #include <pcl/io/pcd_io.h>
-#include <pcl/io/vtk_io.h>
-#include <pcl/io/vtk_lib_io.h>
 #include <pcl/point_types.h>
 #include <pcl/kdtree/kdtree_flann.h>
 #include <pcl/features/normal_3d.h>
 #include <pcl/surface/gp3.h>
-#include <Windows.h>    
-#include <stdio.h>    
+//#include <Windows.h>    
+//#include <stdio.h>    
 #include <gl/GL.h>  
 #include <gl/GLU.h> 
 #include <gl/glut.h>
-#include <conio.h>    
-#include <stdio.h>    
+//#include <conio.h>    
+//#include <stdio.h>    
 #include <math.h>    
-#include <string.h>    
+//#include <string.h>    
 
-#define MOVE_SPEED 0.05f
-#define ROTATE_SPEED 20.0f			//20 deg per 100 pixel
+#define CAMERA_MOVE_SPEED 0.05f			
+#define CAMERA_ROTATE_SPEED 20.0f			//20 deg per 100 pixel
+
+using namespace std;
 
 pcl::PointCloud<pcl::PointXYZ>::Ptr cloud(new pcl::PointCloud<pcl::PointXYZ>);
 pcl::PolygonMesh triangle;
@@ -115,17 +114,42 @@ void SetupRC()
 void Mouse(int button, int state, int x, int y)
 {
 	// only start motion if the left button is pressed
-	if (button == GLUT_LEFT_BUTTON) {
-
-		// when the button is releasedmovedTheta
+	switch (button)
+	{
+	case GLUT_LEFT_BUTTON:			//Mouse left buttton
 		if (state == GLUT_UP) {
 			xClick = -1;
 			yClick = -1;
 		}
-		else {// state = GLUT_DOWN
+		else {
 			xClick = x;
 			yClick = y;
 		}
+		break;
+	case GLUT_MIDDLE_BUTTON:		//Mouse middle button
+
+		break;
+	case GLUT_RIGHT_BUTTON:			//Mouse right button
+
+		break;
+	case 3:							//Mouse scroll up
+
+		break;
+	case 4:							//Mouse scroll down
+
+		break;
+	default:
+
+		break;
+	}
+	if (button == GLUT_LEFT_BUTTON) {
+
+		// when the button is releasedmovedTheta
+
+	}
+	else
+	{
+		cout << "Mouse : " << button << "\tState : " << state << endl;
 	}
 	//glutPostRedisplay();
 }
@@ -144,9 +168,8 @@ void mouseMove(int x, int y)
 	phi = atan(cameraX / cameraZ);
 	if (fixPhi == true)phi += M_PI;
 	if (fixTheta == true)theta += M_PI;
-	cout << "theta = " << theta;
-	deltaTheta = ((yClick - y) / 100.0 * ROTATE_SPEED) * M_PI / 180.0;
-	deltaPhi = ((xClick - x) / 100.0 * ROTATE_SPEED) * M_PI / 180.0;
+	deltaTheta = ((yClick - y) / 100.0 * CAMERA_ROTATE_SPEED) * M_PI / 180.0;
+	deltaPhi = ((xClick - x) / 100.0 * CAMERA_ROTATE_SPEED) * M_PI / 180.0;
 
 	if (((theta + deltaTheta) > M_PI) || ((theta + deltaTheta) < 0))
 	{
@@ -160,7 +183,6 @@ void mouseMove(int x, int y)
 	cameraX = radius * sin(movedTheta) * sin(movedPhi);
 	cameraY = radius * cos(movedTheta);
 
-	cout << "\tmovedTheta = " << movedTheta << endl;
 	if ((fabs(theta) < M_PI_2) && (fabs(movedTheta) > M_PI_2))
 	{
 		fixTheta = true;
@@ -189,7 +211,7 @@ void mouseMove(int x, int y)
 }
 void Keyboard(unsigned char key, int x, int y)
 {
-	GLfloat fraction = MOVE_SPEED;
+	GLfloat fraction = CAMERA_MOVE_SPEED;
 	GLfloat xTemp = cameraX, zTemp = cameraZ;
 	switch (key)
 	{
@@ -205,15 +227,11 @@ void Keyboard(unsigned char key, int x, int y)
 		break;
 	case 'a':
 		fraction = fmax(fabs(cameraX), fabs(cameraZ)) / fraction;
-		cout << "cameraX += " << -zTemp / fraction << endl;
-		cout << "cameraZ += " << xTemp / fraction << endl;
 		cameraX += -zTemp / fraction;
 		cameraZ += xTemp / fraction;
 		break;
 	case 'd':
 		fraction = fmax(fabs(cameraX), fabs(cameraZ)) / fraction;
-		cout << "cameraX -= " << -zTemp / fraction << endl;
-		cout << "cameraZ -= " << xTemp / fraction << endl;
 		cameraX -= -zTemp / fraction;
 		cameraZ -= xTemp / fraction;
 		break;
@@ -338,7 +356,7 @@ int main(int argc, char* argv[])
 	glutMotionFunc(mouseMove);
 	glutSpecialFunc(SpecialKeys);
 	glutDisplayFunc(Display);
-	SetupRC();
+	//SetupRC();
 	glutMainLoop();
 	return 0;
 }
