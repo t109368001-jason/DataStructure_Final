@@ -5,20 +5,15 @@
 #include <pcl/kdtree/kdtree_flann.h>
 #include <pcl/features/normal_3d.h>
 #include <pcl/surface/gp3.h>
-//#include <Windows.h>    
-//#include <stdio.h>    
-#include <gl/GL.h>  
-#include <gl/GLU.h> 
+#include <math.h>
+#include <gl/GL.h>
+#include <gl/GLU.h>
 #include <gl/glut.h>
-//#include <conio.h>    
-//#include <stdio.h>    
-#include <math.h>    
-//#include <string.h>    
 
-#define CAMERA_MOVE_SPEED 0.05f			
-#define CAMERA_ROTATE_SPEED 20.0f			//20 deg per 100 pixel
-
-using namespace std;
+#define CAMERA_MOVE_SPEED			0.05f			//
+#define CAMERA_ROTATE_SPEED			20.0f			//20 deg per 100 pixel
+#define VIEWER_WIDTH				1024.0f
+#define VIEWER_HEIGHT				768.0f
 
 pcl::PointCloud<pcl::PointXYZ>::Ptr cloud(new pcl::PointCloud<pcl::PointXYZ>);
 pcl::PolygonMesh triangle;
@@ -27,31 +22,109 @@ pcl::CentroidPoint<pcl::PointXYZ> centroid;
 
 GLfloat lookPhi = 0.0;
 GLfloat lookTheta = M_PI_2;
-// actual vector representing the camera's direction
-GLfloat xLook = 0.0f, zLook = -1.0f, yLook = 0.0;
-// XZ position of the camera
-GLfloat cameraX = 0.0f, cameraZ = 5.0f, cameraY = 0.0f;
+GLfloat textDeltaPhi = -M_PI / 18.0;
+GLfloat textDeltaTheta = M_PI / 18.0;
+
+GLfloat lookX = 0.0f, lookZ = -1.0f, lookY = 0.0;
+GLfloat cameraX = 0.0f, cameraZ = 1.0f, cameraY = 0.0f;
 
 GLfloat xClick = -1, yClick = -1;
+
 BOOL fixPhi = false;
 BOOL fixTheta = false;
-void output(GLfloat x, GLfloat y,GLfloat z, char *string)
-{
-	int len, i;
+BOOL meshFill = false;
 
-	glRasterPos3f(x, y ,z);
-	len = (int)strlen(string);
-	for (i = 0; i < len; i++) {
-		glutBitmapCharacter(GLUT_BITMAP_TIMES_ROMAN_24, string[i]);
+class Viewer
+{
+private:
+
+public:
+	Viewer()
+	{
+
 	}
-}
+	void draw(pcl::PointCloud<pcl::PointXYZ>::Ptr cloud)		//Draw pointClouds
+	{
+		for (size_t i = 0; i < cloud->points.size(); ++i)
+		{
+			glBegin(GL_POINTS);
+			glVertex3f(cloud->points[i].x, cloud->points[i].y , cloud->points[i].z );
+			glEnd();
+		}
+	}
+	void draw(pcl::PolygonMesh mesh, pcl::PointCloud<pcl::PointXYZ>::Ptr cloud)		//Draw mesh
+	{
+		for (size_t i = 0; i < mesh.polygons.size() - 1; ++i)
+		{
+			if (meshFill)
+			{
+				GLfloat line1X = cloud->points[mesh.polygons[i].vertices[0]].x - cloud->points[mesh.polygons[i].vertices[1]].x;;
+				GLfloat line1Y = cloud->points[mesh.polygons[i].vertices[0]].y - cloud->points[mesh.polygons[i].vertices[1]].y;;
+				GLfloat line1Z = cloud->points[mesh.polygons[i].vertices[0]].z - cloud->points[mesh.polygons[i].vertices[1]].z;;
+				GLfloat line2X = cloud->points[mesh.polygons[i].vertices[1]].x - cloud->points[mesh.polygons[i].vertices[2]].x;;
+				GLfloat line2Y = cloud->points[mesh.polygons[i].vertices[1]].y - cloud->points[mesh.polygons[i].vertices[2]].y;;
+				GLfloat line2Z = cloud->points[mesh.polygons[i].vertices[1]].z - cloud->points[mesh.polygons[i].vertices[2]].z;;
+				GLfloat nX = line1Y * line2Z - line2Y * line1Z;
+				GLfloat nY = line1Z * line2X - line2Z * line1X;
+				GLfloat nZ = line1X * line2Y - line2X * line1Y;
+				GLfloat theta = acos((nX * cameraX + nY * cameraY + nZ * cameraZ) / sqrtf(nX*nX + nY * nY + nZ * nZ) / sqrtf(cameraX * cameraX + cameraY * cameraY + cameraZ * cameraZ));
+				if (acos((nX * cloud->points[mesh.polygons[i].vertices[0]].x + nY * cloud->points[mesh.polygons[i].vertices[0]].y + nZ * cloud->points[mesh.polygons[i].vertices[0]].z) / sqrtf(nX * nX + nY * nY + nZ * nZ) / sqrtf(cloud->points[mesh.polygons[i].vertices[0]].x * cloud->points[mesh.polygons[i].vertices[0]].x + cloud->points[mesh.polygons[i].vertices[0]].y * cloud->points[mesh.polygons[i].vertices[0]].y + cloud->points[mesh.polygons[i].vertices[0]].z * cloud->points[mesh.polygons[i].vertices[0]].z)) < M_PI_2)
+				{
+					theta = (M_PI - theta);
+				}
+				glColor3f(theta / M_PI, theta / M_PI, theta / M_PI);
+				glBegin(GL_TRIANGLES);
+				glVertex3f(cloud->points[mesh.polygons[i].vertices[0]].x, cloud->points[mesh.polygons[i].vertices[0]].y, cloud->points[mesh.polygons[i].vertices[0]].z);
+				glVertex3f(cloud->points[mesh.polygons[i].vertices[1]].x, cloud->points[mesh.polygons[i].vertices[1]].y, cloud->points[mesh.polygons[i].vertices[1]].z);
+				glVertex3f(cloud->points[mesh.polygons[i].vertices[2]].x, cloud->points[mesh.polygons[i].vertices[2]].y, cloud->points[mesh.polygons[i].vertices[2]].z);
+				glEnd();
+			}
+			else
+			{
+				glBegin(GL_LINES);
+				glVertex3f(cloud->points[mesh.polygons[i].vertices[0]].x, cloud->points[mesh.polygons[i].vertices[0]].y, cloud->points[mesh.polygons[i].vertices[0]].z);
+				glVertex3f(cloud->points[mesh.polygons[i].vertices[1]].x, cloud->points[mesh.polygons[i].vertices[1]].y, cloud->points[mesh.polygons[i].vertices[1]].z);
+				glVertex3f(cloud->points[mesh.polygons[i].vertices[2]].x, cloud->points[mesh.polygons[i].vertices[2]].y, cloud->points[mesh.polygons[i].vertices[2]].z);
+				glVertex3f(cloud->points[mesh.polygons[i].vertices[0]].x, cloud->points[mesh.polygons[i].vertices[0]].y, cloud->points[mesh.polygons[i].vertices[0]].z);
+				glEnd();
+			}
+		}
+	}
+	void draw(GLfloat x, GLfloat y, std::string s)		//Draw text
+	{
+		glPushMatrix();
+		glMatrixMode(GL_PROJECTION);
+		glPushMatrix();
+		glLoadIdentity();
+		gluOrtho2D(0.0, VIEWER_WIDTH, 0.0, VIEWER_HEIGHT);
+		glMatrixMode(GL_MODELVIEW);
+		glLoadIdentity();
+		glColor3f(1.0f, 1.0f, 1.0f);//needs to be called before RasterPos
+		glRasterPos2f(x, y);
+		void * font = GLUT_BITMAP_9_BY_15;
+
+		for (std::string::iterator i = s.begin(); i != s.end(); ++i)
+		{
+			char c = *i;
+			//this does nothing, color is fixed for Bitmaps when calling glRasterPos
+			//glColor3f(1.0, 0.0, 1.0); 
+			glutBitmapCharacter(font, c);
+		}
+		glMatrixMode(GL_PROJECTION);
+		glPopMatrix();
+		glMatrixMode(GL_MODELVIEW);
+		glPopMatrix();
+		glEnable(GL_TEXTURE_2D);
+	}
+	void display()
+	{
+
+	}
+};
+Viewer viewer;
 void Display(void)
 {
-	//清除
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-	//保存矩陣 
-	glPushMatrix();
 
 	glColor3f(1.0, 1.0, 1.0);
 	glPointSize(1.0);
@@ -59,58 +132,18 @@ void Display(void)
 
 	glLoadIdentity();
 
-	gluLookAt(cameraX, cameraY, cameraZ,
-		cameraX + xLook, cameraY + yLook, cameraZ + zLook,
-		0.0f, 1.0f, 0.0f);
-	/*
-	//旋轉 
-	glRotatef(xRot, 0.0f, 1.0f, 0.0f);
-	glRotatef(yRot, 1.0f, 0.0f, 0.0f);
-	glRotatef(zRot, 0.0f, 0.0f, 1.0f);
+	gluLookAt(cameraX, cameraY, cameraZ, cameraX + lookX, cameraY + lookY, cameraZ + lookZ, 0.0f, 1.0f, 0.0f);
 
-	glutWireTeapot(2);
-	*/
+	viewer.draw(triangle, cloud);
 
-	pcl::PointCloud<pcl::PointXYZ> *x = cloud.get();
-	for (size_t i = 0; i < triangle.polygons.size() - 1; ++i)
-	{
-		glBegin(GL_LINES);
-		glVertex3f(x->points[triangle.polygons[i].vertices[0]].x, x->points[triangle.polygons[i].vertices[0]].y, x->points[triangle.polygons[i].vertices[0]].z);
-		glVertex3f(x->points[triangle.polygons[i].vertices[1]].x, x->points[triangle.polygons[i].vertices[1]].y, x->points[triangle.polygons[i].vertices[1]].z);
-		glEnd();
-		glBegin(GL_LINES);
-		glVertex3f(x->points[triangle.polygons[i].vertices[1]].x, x->points[triangle.polygons[i].vertices[1]].y, x->points[triangle.polygons[i].vertices[1]].z);
-		glVertex3f(x->points[triangle.polygons[i].vertices[2]].x, x->points[triangle.polygons[i].vertices[2]].y, x->points[triangle.polygons[i].vertices[2]].z);
-		glEnd();
-		glBegin(GL_LINES);
-		glVertex3f(x->points[triangle.polygons[i].vertices[0]].x, x->points[triangle.polygons[i].vertices[0]].y, x->points[triangle.polygons[i].vertices[0]].z);
-		glVertex3f(x->points[triangle.polygons[i].vertices[2]].x, x->points[triangle.polygons[i].vertices[2]].y, x->points[triangle.polygons[i].vertices[2]].z);
-		glEnd();
-	}
-	//output(cameraX + xLook*10, cameraY + yLook*10, cameraZ + zLook*10,"xxxx");
-	/*
-	pcl::PointCloud<pcl::PointXYZ> *x = cloud.get();
-	for (size_t i = 0; i < x->points.size(); ++i)
-	{
-	glBegin(GL_POINTS);
-
-	glVertex3f(x->points[i].x * scaleD, x->points[i].y * scaleD, x->points[i].z * scaleD);
-	glEnd();
-	}*/
-
-	glPopMatrix();
+	viewer.draw(10, 64, "W S A D : Move camera");
+	viewer.draw(10, 48, "Up Down Left Right : Rotate camera");
+	viewer.draw(10, 32, "Mouse drag : Rotate object");
+	viewer.draw(10, 16, "Mouse scroll : Zoom");
 
 	glutSwapBuffers();
 }
 
-void SetupRC()
-{
-	glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
-
-	glEnable(GL_DEPTH_TEST);
-	glEnable(GL_DITHER);
-	glShadeModel(GL_SMOOTH);
-}
 void Mouse(int button, int state, int x, int y)
 {
 	// only start motion if the left button is pressed
@@ -134,26 +167,22 @@ void Mouse(int button, int state, int x, int y)
 		break;
 	case 3:							//Mouse scroll up
 
+		cameraX += lookX * CAMERA_MOVE_SPEED;
+		cameraZ += lookZ * CAMERA_MOVE_SPEED;
+		cameraY += lookY * CAMERA_MOVE_SPEED;
 		break;
 	case 4:							//Mouse scroll down
-
+		cameraX -= lookX * CAMERA_MOVE_SPEED;
+		cameraZ -= lookZ * CAMERA_MOVE_SPEED;
+		cameraY -= lookY * CAMERA_MOVE_SPEED;
 		break;
 	default:
-
+		std::cout << "Mouse : " << button << "\tState : " << state << std::endl;
 		break;
 	}
-	if (button == GLUT_LEFT_BUTTON) {
-
-		// when the button is releasedmovedTheta
-
-	}
-	else
-	{
-		cout << "Mouse : " << button << "\tState : " << state << endl;
-	}
-	//glutPostRedisplay();
+	glutPostRedisplay();
 }
-void mouseMove(int x, int y) 
+void mouseMove(int x, int y)
 {
 	GLfloat radius;
 	GLfloat theta;
@@ -195,7 +224,7 @@ void mouseMove(int x, int y)
 	{
 		fixPhi = true;
 	}
-	if (((fabs(phi) > M_PI_2) && (fabs(movedPhi) < M_PI_2))|| ((fabs(phi) < M_PI + M_PI_2) && (fabs(movedPhi) > M_PI + M_PI_2)))
+	if (((fabs(phi) > M_PI_2) && (fabs(movedPhi) < M_PI_2)) || ((fabs(phi) < M_PI + M_PI_2) && (fabs(movedPhi) > M_PI + M_PI_2)))
 	{
 		fixPhi = false;
 	}
@@ -204,9 +233,9 @@ void mouseMove(int x, int y)
 	yClick = y;
 	lookTheta -= deltaTheta;
 	lookPhi -= deltaPhi;
-	zLook = -sin(lookTheta)*cos(lookPhi);
-	xLook = sin(lookTheta)*sin(lookPhi);
-	yLook = cos(lookTheta);
+	lookZ = -sin(lookTheta)*cos(lookPhi);
+	lookX = sin(lookTheta)*sin(lookPhi);
+	lookY = cos(lookTheta);
 	glutPostRedisplay();
 }
 void Keyboard(unsigned char key, int x, int y)
@@ -216,25 +245,30 @@ void Keyboard(unsigned char key, int x, int y)
 	switch (key)
 	{
 	case 'w':
-		cameraX += xLook * fraction;
-		cameraZ += zLook * fraction;
-		cameraY += yLook * fraction;
+		cameraX += lookX * CAMERA_MOVE_SPEED;
+		cameraZ += lookZ * CAMERA_MOVE_SPEED;
+		cameraY += lookY * CAMERA_MOVE_SPEED;
 		break;
 	case 's':
-		cameraX -= xLook * fraction;
-		cameraZ -= zLook * fraction;
-		cameraY -= yLook * fraction;
+		cameraX -= lookX * CAMERA_MOVE_SPEED;
+		cameraZ -= lookZ * CAMERA_MOVE_SPEED;
+		cameraY -= lookY * CAMERA_MOVE_SPEED;
 		break;
 	case 'a':
-		fraction = fmax(fabs(cameraX), fabs(cameraZ)) / fraction;
+		fraction = fmax(fabs(cameraX), fabs(cameraZ)) / CAMERA_MOVE_SPEED;
 		cameraX += -zTemp / fraction;
 		cameraZ += xTemp / fraction;
 		break;
 	case 'd':
-		fraction = fmax(fabs(cameraX), fabs(cameraZ)) / fraction;
+		fraction = fmax(fabs(cameraX), fabs(cameraZ)) / CAMERA_MOVE_SPEED;
 		cameraX -= -zTemp / fraction;
 		cameraZ -= xTemp / fraction;
 		break;
+	case 'f':
+
+		meshFill = !meshFill;
+		break;
+
 
 	default: printf("   Keyboard %c == %d\n", key, key);	break;
 
@@ -247,35 +281,34 @@ void SpecialKeys(int key, int x, int y)
 	{
 	case GLUT_KEY_LEFT:
 		lookPhi -= 0.1f;
-		zLook = -sin(lookTheta)*cos(lookPhi);
-		xLook = sin(lookTheta)*sin(lookPhi);
-		yLook = cos(lookTheta);
+		lookZ = -sin(lookTheta)*cos(lookPhi);
+		lookX = sin(lookTheta)*sin(lookPhi);
+		lookY = cos(lookTheta);
 		break;
 	case GLUT_KEY_RIGHT:
 		lookPhi += 0.1f;
-		zLook = -sin(lookTheta)*cos(lookPhi);
-		xLook = sin(lookTheta)*sin(lookPhi);
-		yLook = cos(lookTheta);
+		lookZ = -sin(lookTheta)*cos(lookPhi);
+		lookX = sin(lookTheta)*sin(lookPhi);
+		lookY = cos(lookTheta);
 		break;
 	case GLUT_KEY_UP:
 		if (lookTheta < (M_PI - 0.1))
 			lookTheta -= 0.1f;
-		zLook = -sin(lookTheta)*cos(lookPhi);
-		xLook = sin(lookTheta)*sin(lookPhi);
-		yLook = cos(lookTheta);
+		lookZ = -sin(lookTheta)*cos(lookPhi);
+		lookX = sin(lookTheta)*sin(lookPhi);
+		lookY = cos(lookTheta);
 		break;
 		break;
 	case GLUT_KEY_DOWN:
 		if (lookTheta > 0.1)
 			lookTheta += 0.1f;
-		zLook = -sin(lookTheta)*cos(lookPhi);
-		xLook = sin(lookTheta)*sin(lookPhi);
-		yLook = cos(lookTheta);
+		lookZ = -sin(lookTheta)*cos(lookPhi);
+		lookX = sin(lookTheta)*sin(lookPhi);
+		lookY = cos(lookTheta);
 		break;
 	}
 	glutPostRedisplay();
 }
-
 
 void ChangeSize(int w, int h)
 {
@@ -300,11 +333,6 @@ int main(int argc, char* argv[])
 	pcl::io::loadPCDFile("../file/bunny.pcd", cloud_blob);
 	pcl::fromPCLPointCloud2(cloud_blob, *cloud);
 	//* the data should be available in cloud
-	pcl::PointCloud<pcl::PointXYZ> *x = cloud.get();
-	for (size_t i = 0; i < x->points.size(); ++i)
-	{
-		centroid.add(x->points[i]);
-	}
 
 	// Normal estimation*
 	pcl::NormalEstimation<pcl::PointXYZ, pcl::Normal> n;
@@ -348,7 +376,7 @@ int main(int argc, char* argv[])
 	//////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	glutInit(&argc, argv);
 	glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB | GLUT_DEPTH);
-	glutInitWindowSize(800, 800);
+	glutInitWindowSize(VIEWER_WIDTH, VIEWER_HEIGHT);
 	glutCreateWindow("RGB Cube");
 	glutReshapeFunc(ChangeSize);
 	glutKeyboardFunc(Keyboard);
@@ -356,7 +384,7 @@ int main(int argc, char* argv[])
 	glutMotionFunc(mouseMove);
 	glutSpecialFunc(SpecialKeys);
 	glutDisplayFunc(Display);
-	//SetupRC();
+
 	glutMainLoop();
 	return 0;
 }
