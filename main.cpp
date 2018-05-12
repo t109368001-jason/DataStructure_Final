@@ -185,6 +185,7 @@ void mouseMove(int x, int y)
 	zLook = -sin(lookTheta)*cos(lookPhi);
 	xLook = sin(lookTheta)*sin(lookPhi);
 	yLook = cos(lookTheta);
+	glutPostRedisplay();
 }
 void Keyboard(unsigned char key, int x, int y)
 {
