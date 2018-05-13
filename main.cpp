@@ -6,6 +6,7 @@
 #include <pcl/features/normal_3d.h>
 #include <pcl/surface/gp3.h>
 #include <math.h>
+#include <vector>
 #include <gl/GL.h>
 #include <gl/GLU.h>
 #include <gl/glut.h>
@@ -52,12 +53,18 @@ public:
 			glEnd();
 		}
 	}
-	void draw(pcl::PolygonMesh mesh, pcl::PointCloud<pcl::PointXYZ>::Ptr cloud)		//Draw mesh
+	void draw(pcl::PolygonMesh &mesh)		//Draw mesh
 	{
+
+		pcl::PointCloud<pcl::PointXYZ>::Ptr cloud(new pcl::PointCloud<pcl::PointXYZ>);
+		pcl::fromPCLPointCloud2(mesh.cloud, *cloud);
+
 		for (size_t i = 0; i < mesh.polygons.size() - 1; ++i)
 		{
 			if (meshFill)
 			{
+				//有BUG的光影
+				std::cout << triangle.cloud.data[i + 0] << "\t" << triangle.cloud.data[i + 0] << "\t" << triangle.cloud.data[i + 0] << std::endl;
 				GLfloat line1X = cloud->points[mesh.polygons[i].vertices[0]].x - cloud->points[mesh.polygons[i].vertices[1]].x;;
 				GLfloat line1Y = cloud->points[mesh.polygons[i].vertices[0]].y - cloud->points[mesh.polygons[i].vertices[1]].y;;
 				GLfloat line1Z = cloud->points[mesh.polygons[i].vertices[0]].z - cloud->points[mesh.polygons[i].vertices[1]].z;;
@@ -73,6 +80,7 @@ public:
 					theta = (M_PI - theta);
 				}
 				glColor3f(theta / M_PI, theta / M_PI, theta / M_PI);
+
 				glBegin(GL_TRIANGLES);
 				glVertex3f(cloud->points[mesh.polygons[i].vertices[0]].x, cloud->points[mesh.polygons[i].vertices[0]].y, cloud->points[mesh.polygons[i].vertices[0]].z);
 				glVertex3f(cloud->points[mesh.polygons[i].vertices[1]].x, cloud->points[mesh.polygons[i].vertices[1]].y, cloud->points[mesh.polygons[i].vertices[1]].z);
@@ -134,7 +142,7 @@ void Display(void)
 
 	gluLookAt(cameraX, cameraY, cameraZ, cameraX + lookX, cameraY + lookY, cameraZ + lookZ, 0.0f, 1.0f, 0.0f);
 
-	viewer.draw(triangle, cloud);
+	viewer.draw(triangle);
 
 	viewer.draw(10, 64, "W S A D : Move camera");
 	viewer.draw(10, 48, "Up Down Left Right : Rotate camera");
@@ -377,7 +385,7 @@ int main(int argc, char* argv[])
 	glutInit(&argc, argv);
 	glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB | GLUT_DEPTH);
 	glutInitWindowSize(VIEWER_WIDTH, VIEWER_HEIGHT);
-	glutCreateWindow("RGB Cube");
+	glutCreateWindow("Point Clout Viewer");
 	glutReshapeFunc(ChangeSize);
 	glutKeyboardFunc(Keyboard);
 	glutMouseFunc(Mouse);
