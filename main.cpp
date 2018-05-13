@@ -1,8 +1,4 @@
-<<<<<<< HEAD
-//456
-=======
 //123
->>>>>>> Rayz_branch
 #include <pcl/io/io.h>
 #include <pcl/io/pcd_io.h>
 #include <pcl/point_types.h>
