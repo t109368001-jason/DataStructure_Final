@@ -1,4 +1,4 @@
-# Install script for directory: C:/Users/XIAO/Documents/c/DataStructure_Final
+# Install script for directory: C:/Users/XIAO/OneDrive/文件/c/DataStructure_Final
 
 # Set the install prefix
 if(NOT DEFINED CMAKE_INSTALL_PREFIX)
@@ -40,5 +40,5 @@ endif()
 
 string(REPLACE ";" "\n" CMAKE_INSTALL_MANIFEST_CONTENT
        "${CMAKE_INSTALL_MANIFEST_FILES}")
-file(WRITE "C:/Users/XIAO/Documents/c/DataStructure_Final/XIAO_Project/${CMAKE_INSTALL_MANIFEST}"
+file(WRITE "C:/Users/XIAO/OneDrive/文件/c/DataStructure_Final/XIAO_Project/${CMAKE_INSTALL_MANIFEST}"
      "${CMAKE_INSTALL_MANIFEST_CONTENT}")
