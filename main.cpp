@@ -15,15 +15,12 @@
 #define VIEWER_WIDTH				1024.0f
 #define VIEWER_HEIGHT				768.0f
 
-pcl::PointCloud<pcl::PointXYZ>::Ptr cloud(new pcl::PointCloud<pcl::PointXYZ>);
 pcl::PolygonMesh triangle;
 
 pcl::CentroidPoint<pcl::PointXYZ> centroid;
 
 GLfloat lookPhi = 0.0;
 GLfloat lookTheta = M_PI_2;
-GLfloat textDeltaPhi = -M_PI / 18.0;
-GLfloat textDeltaTheta = M_PI / 18.0;
 
 GLfloat lookX = 0.0f, lookZ = -1.0f, lookY = 0.0;
 GLfloat cameraX = 0.0f, cameraZ = 1.0f, cameraY = 0.0f;
@@ -45,12 +42,12 @@ public:
 	}
 	void draw(pcl::PointCloud<pcl::PointXYZ>::Ptr cloud)		//Draw pointClouds
 	{
+		glBegin(GL_POINTS);
 		for (size_t i = 0; i < cloud->points.size(); ++i)
 		{
-			glBegin(GL_POINTS);
 			glVertex3f(cloud->points[i].x, cloud->points[i].y , cloud->points[i].z );
-			glEnd();
 		}
+		glEnd();
 	}
 	void draw(pcl::PolygonMesh &mesh)		//Draw mesh
 	{
@@ -63,7 +60,7 @@ public:
 			if (meshFill)
 			{
 				//有BUG的光影
-				std::cout << triangle.cloud.data[i + 0] << "\t" << triangle.cloud.data[i + 0] << "\t" << triangle.cloud.data[i + 0] << std::endl;
+				//std::cout << triangle.cloud.data[i + 0] << "\t" << triangle.cloud.data[i + 0] << "\t" << triangle.cloud.data[i + 0] << std::endl;
 				GLfloat line1X = cloud->points[mesh.polygons[i].vertices[0]].x - cloud->points[mesh.polygons[i].vertices[1]].x;;
 				GLfloat line1Y = cloud->points[mesh.polygons[i].vertices[0]].y - cloud->points[mesh.polygons[i].vertices[1]].y;;
 				GLfloat line1Z = cloud->points[mesh.polygons[i].vertices[0]].z - cloud->points[mesh.polygons[i].vertices[1]].z;;
@@ -73,8 +70,8 @@ public:
 				GLfloat nX = line1Y * line2Z - line2Y * line1Z;
 				GLfloat nY = line1Z * line2X - line2Z * line1X;
 				GLfloat nZ = line1X * line2Y - line2X * line1Y;
-				GLfloat theta = acos((nX * cameraX + nY * cameraY + nZ * cameraZ) / sqrtf(nX*nX + nY * nY + nZ * nZ) / sqrtf(cameraX * cameraX + cameraY * cameraY + cameraZ * cameraZ));
-				if (acos((nX * cloud->points[mesh.polygons[i].vertices[0]].x + nY * cloud->points[mesh.polygons[i].vertices[0]].y + nZ * cloud->points[mesh.polygons[i].vertices[0]].z) / sqrtf(nX * nX + nY * nY + nZ * nZ) / sqrtf(cloud->points[mesh.polygons[i].vertices[0]].x * cloud->points[mesh.polygons[i].vertices[0]].x + cloud->points[mesh.polygons[i].vertices[0]].y * cloud->points[mesh.polygons[i].vertices[0]].y + cloud->points[mesh.polygons[i].vertices[0]].z * cloud->points[mesh.polygons[i].vertices[0]].z)) < M_PI_2)
+				GLfloat theta = acos((nX * lookX + nY * lookY + nZ * lookZ) / sqrtf(nX*nX + nY * nY + nZ * nZ) / sqrtf(lookX * lookX + lookY * lookY + lookZ * lookZ));
+				if (acos((nX * cloud->points[mesh.polygons[i].vertices[0]].x + nY * cloud->points[mesh.polygons[i].vertices[0]].y + nZ * cloud->points[mesh.polygons[i].vertices[0]].z) / sqrtf(nX * nX + nY * nY + nZ * nZ) / sqrtf(cloud->points[mesh.polygons[i].vertices[0]].x * cloud->points[mesh.polygons[i].vertices[0]].x + cloud->points[mesh.polygons[i].vertices[0]].y * cloud->points[mesh.polygons[i].vertices[0]].y + cloud->points[mesh.polygons[i].vertices[0]].z * cloud->points[mesh.polygons[i].vertices[0]].z)) > M_PI_2)
 				{
 					theta = (M_PI - theta);
 				}
@@ -262,17 +259,16 @@ void Keyboard(unsigned char key, int x, int y)
 		cameraY -= lookY * CAMERA_MOVE_SPEED;
 		break;
 	case 'a':
-		fraction = fmax(fabs(cameraX), fabs(cameraZ)) / CAMERA_MOVE_SPEED;
+		fraction = sqrtf(cameraX * cameraX + cameraZ * cameraZ) / CAMERA_MOVE_SPEED;
 		cameraX += -zTemp / fraction;
 		cameraZ += xTemp / fraction;
 		break;
 	case 'd':
-		fraction = fmax(fabs(cameraX), fabs(cameraZ)) / CAMERA_MOVE_SPEED;
+		fraction = sqrtf(cameraX * cameraX + cameraZ * cameraZ) / CAMERA_MOVE_SPEED;
 		cameraX -= -zTemp / fraction;
 		cameraZ -= xTemp / fraction;
 		break;
 	case 'f':
-
 		meshFill = !meshFill;
 		break;
 
@@ -300,7 +296,7 @@ void SpecialKeys(int key, int x, int y)
 		break;
 	case GLUT_KEY_UP:
 		if (lookTheta < (M_PI - 0.1))
-			lookTheta -= 0.1f;
+			lookTheta += 0.1f;
 		lookZ = -sin(lookTheta)*cos(lookPhi);
 		lookX = sin(lookTheta)*sin(lookPhi);
 		lookY = cos(lookTheta);
@@ -308,7 +304,7 @@ void SpecialKeys(int key, int x, int y)
 		break;
 	case GLUT_KEY_DOWN:
 		if (lookTheta > 0.1)
-			lookTheta += 0.1f;
+			lookTheta -= 0.1f;
 		lookZ = -sin(lookTheta)*cos(lookPhi);
 		lookX = sin(lookTheta)*sin(lookPhi);
 		lookY = cos(lookTheta);
@@ -335,6 +331,7 @@ void ChangeSize(int w, int h)
 }
 int main(int argc, char* argv[])
 {
+	pcl::PointCloud<pcl::PointXYZ>::Ptr cloud(new pcl::PointCloud<pcl::PointXYZ>);
 	// Load input file into a PointCloud<T> with an appropriate type
 	pcl::PCLPointCloud2 cloud_blob;
 	pcl::io::loadPCDFile("../file/bunny.pcd", cloud_blob);
