@@ -1,7 +1,7 @@
 #include "viewer.h"
 Viewer::Viewer()
 {
-
+	/*
 	GLfloat lookPhi = 0.0;
 	GLfloat lookTheta = M_PI_2;
 	GLfloat textDeltaPhi = -M_PI / 18.0;
@@ -9,7 +9,7 @@ Viewer::Viewer()
 
 	GLfloat lookX = 0.0f, lookZ = -1.0f, lookY = 0.0;
 	GLfloat cameraX = 0.0f, cameraZ = 1.0f, cameraY = 0.0f;
-	this->location;
+	*/
 }
 void Viewer::draw(pcl::PointCloud<pcl::PointXYZ>::Ptr cloud)		//Draw pointClouds
 {
@@ -90,4 +90,8 @@ void Viewer::draw(GLfloat x, GLfloat y, std::string s)		//Draw text
 	glMatrixMode(GL_MODELVIEW);
 	glPopMatrix();
 	glEnable(GL_TEXTURE_2D);
+}
+void Viewer::play(PlayMode mode)
+{
+
 }
