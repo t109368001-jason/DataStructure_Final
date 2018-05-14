@@ -309,6 +309,7 @@ if %errorlevel% neq 0 goto :VCEnd</Command>
     </CustomBuild>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="..\include\viewer.cpp" />
     <ClCompile Include="C:\Users\XIAO\OneDrive\文件\c\DataStructure_Final\main.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -319,6 +320,9 @@ if %errorlevel% neq 0 goto :VCEnd</Command>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\file\進度.md" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\include\viewer.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

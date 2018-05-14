@@ -1,17 +1,17 @@
 #include <iostream>
-#include <pcl/io/io.h>
+#include <fstream>
 #include <pcl/io/pcd_io.h>
 #include <pcl/point_types.h>
 #include <pcl/kdtree/kdtree_flann.h>
 #include <pcl/features/normal_3d.h>
 #include <pcl/surface/gp3.h>
-#include <pcl/surface/marching_cubes_rbf.h>
 #include <math.h>
 #include <vector>
 #include <gl/GL.h>
 #include <gl/GLU.h>
 #include <gl/glut.h>
 #include <wingdi.h>
+#include "include\viewer.h"
 
 #define CAMERA_MOVE_SPEED			0.05f			//
 #define CAMERA_ROTATE_SPEED			20.0f			//20 deg per 100 pixel
@@ -23,13 +23,6 @@ pcl::PolygonMesh triangle;
 
 pcl::CentroidPoint<pcl::PointXYZ> centroid;
 
-GLfloat lookPhi = 0.0;
-GLfloat lookTheta = M_PI_2;
-GLfloat textDeltaPhi = -M_PI / 18.0;
-GLfloat textDeltaTheta = M_PI / 18.0;
-
-GLfloat lookX = 0.0f, lookZ = -1.0f, lookY = 0.0;
-GLfloat cameraX = 0.0f, cameraZ = 1.0f, cameraY = 0.0f;
 
 GLfloat xClick = -1, yClick = -1;
 
@@ -38,104 +31,65 @@ BOOL fixTheta = false;
 BOOL meshFill = false;
 uint32_t filename = 1;
 
-
-class Viewer
-{
-private:
-
-public:
-	Viewer()
-	{
-
-	}
-	void draw(pcl::PointCloud<pcl::PointXYZ>::Ptr cloud)		//Draw pointClouds
-	{
-		for (size_t i = 0; i < cloud->points.size(); ++i)
-		{
-			
-			glBegin(GL_POINTS);
-			glVertex3f(cloud->points[i].x, cloud->points[i].y , cloud->points[i].z );
-			glEnd();
-		}
-	}
-	void draw(pcl::PolygonMesh &mesh)		//Draw mesh
-	{
-		pcl::PointCloud<pcl::PointXYZ>::Ptr cloud(new pcl::PointCloud<pcl::PointXYZ>);
-		pcl::fromPCLPointCloud2(mesh.cloud, *cloud);
-
-		for (size_t i = 0; i < mesh.polygons.size() - 1; ++i)
-		{
-			if (meshFill)
-			{
-				//有BUG的光影
-				//std::cout << triangle.cloud.data[i + 0] << "\t" << triangle.cloud.data[i + 0] << "\t" << triangle.cloud.data[i + 0] << std::endl;
-				GLfloat line1X = cloud->points[mesh.polygons[i].vertices[0]].x - cloud->points[mesh.polygons[i].vertices[1]].x;
-				GLfloat line1Y = cloud->points[mesh.polygons[i].vertices[0]].y - cloud->points[mesh.polygons[i].vertices[1]].y;
-				GLfloat line1Z = cloud->points[mesh.polygons[i].vertices[0]].z - cloud->points[mesh.polygons[i].vertices[1]].z;
-				GLfloat line2X = cloud->points[mesh.polygons[i].vertices[1]].x - cloud->points[mesh.polygons[i].vertices[2]].x;
-				GLfloat line2Y = cloud->points[mesh.polygons[i].vertices[1]].y - cloud->points[mesh.polygons[i].vertices[2]].y;
-				GLfloat line2Z = cloud->points[mesh.polygons[i].vertices[1]].z - cloud->points[mesh.polygons[i].vertices[2]].z;
-				GLfloat nX = line1Y * line2Z - line2Y * line1Z;
-				GLfloat nY = line1Z * line2X - line2Z * line1X;
-				GLfloat nZ = line1X * line2Y - line2X * line1Y;
-				GLfloat theta = acos((nX * cameraX + nY * cameraY + nZ * cameraZ) / sqrtf(nX*nX + nY * nY + nZ * nZ) / sqrtf(cameraX * cameraX + cameraY * cameraY + cameraZ * cameraZ));
-				if (acos((nX * cloud->points[mesh.polygons[i].vertices[0]].x + nY * cloud->points[mesh.polygons[i].vertices[0]].y + nZ * cloud->points[mesh.polygons[i].vertices[0]].z) / sqrtf(nX * nX + nY * nY + nZ * nZ) / sqrtf(cloud->points[mesh.polygons[i].vertices[0]].x * cloud->points[mesh.polygons[i].vertices[0]].x + cloud->points[mesh.polygons[i].vertices[0]].y * cloud->points[mesh.polygons[i].vertices[0]].y + cloud->points[mesh.polygons[i].vertices[0]].z * cloud->points[mesh.polygons[i].vertices[0]].z)) < M_PI_2)
-				{
-					theta = (M_PI - theta);
-				}
-				glColor3f(theta / M_PI, theta / M_PI, theta / M_PI);
-
-				glBegin(GL_TRIANGLES);
-				glVertex3f(cloud->points[mesh.polygons[i].vertices[0]].x, cloud->points[mesh.polygons[i].vertices[0]].y, cloud->points[mesh.polygons[i].vertices[0]].z);
-				glVertex3f(cloud->points[mesh.polygons[i].vertices[1]].x, cloud->points[mesh.polygons[i].vertices[1]].y, cloud->points[mesh.polygons[i].vertices[1]].z);
-				glVertex3f(cloud->points[mesh.polygons[i].vertices[2]].x, cloud->points[mesh.polygons[i].vertices[2]].y, cloud->points[mesh.polygons[i].vertices[2]].z);
-				glEnd();
-			}
-			else
-			{
-				glBegin(GL_LINES);
-				glVertex3f(cloud->points[mesh.polygons[i].vertices[0]].x, cloud->points[mesh.polygons[i].vertices[0]].y, cloud->points[mesh.polygons[i].vertices[0]].z);
-				glVertex3f(cloud->points[mesh.polygons[i].vertices[1]].x, cloud->points[mesh.polygons[i].vertices[1]].y, cloud->points[mesh.polygons[i].vertices[1]].z);
-				glVertex3f(cloud->points[mesh.polygons[i].vertices[2]].x, cloud->points[mesh.polygons[i].vertices[2]].y, cloud->points[mesh.polygons[i].vertices[2]].z);
-				glVertex3f(cloud->points[mesh.polygons[i].vertices[0]].x, cloud->points[mesh.polygons[i].vertices[0]].y, cloud->points[mesh.polygons[i].vertices[0]].z);
-				glEnd();
-			}
-		}
-	}
-	void draw(GLfloat x, GLfloat y, std::string s)		//Draw text
-	{
-		glPushMatrix();
-		glMatrixMode(GL_PROJECTION);
-		glPushMatrix();
-		glLoadIdentity();
-		gluOrtho2D(0.0, VIEWER_WIDTH, 0.0, VIEWER_HEIGHT);
-		glMatrixMode(GL_MODELVIEW);
-		glLoadIdentity();
-		glColor3f(1.0f, 1.0f, 1.0f);//needs to be called before RasterPos
-		glRasterPos2f(x, y);
-		void * font = GLUT_BITMAP_9_BY_15;
-
-		for (std::string::iterator i = s.begin(); i != s.end(); ++i)
-		{
-			char c = *i;
-			//this does nothing, color is fixed for Bitmaps when calling glRasterPos
-			//glColor3f(1.0, 0.0, 1.0); 
-			glutBitmapCharacter(font, c);
-		}
-		glMatrixMode(GL_PROJECTION);
-		glPopMatrix();
-		glMatrixMode(GL_MODELVIEW);
-		glPopMatrix();
-		glEnable(GL_TEXTURE_2D);
-	}
-	void display()
-	{
-
-	}
-};
-Viewer viewer;
+std::stringstream fileName;
 
 void mouseMove(int x, int y);
+void ChangeSize(int w, int h);
+void Display(void);
+void Keyboard(unsigned char key, int x, int y);
+void Mouse(int button, int state, int x, int y);
+void ReadStlModel();
+void SaveAsBMP(const char *fileName);
+void SpecialKeys(int key, int x, int y);
+
+Viewer viewer;
+
+
+/*void ReadStlModel()
+{
+	//ifstream infile("C:\\Users\\FrankFang\\Desktop\\stl.txt");  
+	std::ifstream infile("C:\\Users\\FrankFang\\Desktop\\mode.stl");
+	if (!infile.is_open())
+	{
+		return;
+	}
+	std::string temp, modelname;
+
+	char dump[256];
+	int trinumber = 0;
+	std::vector<std::vector<GLfloat>> tempTriAngle;
+	infile >> temp;
+	int test = temp.compare("solid");
+	if (test != 0)
+	{
+		return;
+	}
+
+	infile.getline(dump, 25);
+	infile >> temp;
+	while (temp.compare("facet") == 0)
+	{
+		trinumber++;//三角形数目  
+		infile >> temp;//get rid of "normal "  
+		infile >> tempTriAngle.NormDir.x;
+		infile >> tempTriAngle.NormDir.y;
+		infile >> tempTriAngle.NormDir.z;
+
+		infile.getline(dump, 256); infile.getline(dump, 256);//get rid of "outer loop"  
+		for (int i = 0; i<3; i++)
+		{
+			infile >> temp;
+			infile >> tempTriAngle.vertex[i].x;
+			infile >> tempTriAngle.vertex[i].y;
+			infile >> tempTriAngle.vertex[i].z;
+			//tempTriAngle.push_back(temppoint[i]);  
+		}
+		TrangleVector.push_back(tempTriAngle);
+		infile >> temp;
+		infile >> temp;
+		infile >> temp;
+	}//while()  
+}*/
 void SaveAsBMP(const char *fileName)
 {
 	FILE *file;
@@ -195,7 +149,7 @@ void Display(void)
 	mouseMove(5, 0);
 	gluLookAt(cameraX, cameraY, cameraZ, cameraX + lookX, cameraY + lookY, cameraZ + lookZ, 0.0f, 1.0f, 0.0f);
 
-	viewer.draw(triangle);
+	viewer.draw(triangle,false);
 
 	viewer.draw(10, 64, "W S A D : Move camera");
 	viewer.draw(10, 48, "Up Down Left Right : Rotate camera");
@@ -205,7 +159,7 @@ void Display(void)
 
 	glutSwapBuffers();
 
-	if (filename < 1000)
+	if (filename < 2)
 	{
 		std::stringstream ss;
 		ss << "../picture/";
