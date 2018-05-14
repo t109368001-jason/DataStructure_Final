@@ -91,7 +91,3 @@ void Viewer::draw(GLfloat x, GLfloat y, std::string s)		//Draw text
 	glPopMatrix();
 	glEnable(GL_TEXTURE_2D);
 }
-void Viewer::play(PlayMode mode)
-{
-
-}

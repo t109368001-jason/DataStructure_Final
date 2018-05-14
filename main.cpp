@@ -12,7 +12,8 @@
 #include <gl/glut.h>
 #include <wingdi.h>
 #include "include\viewer.h"
-
+#include <Eigen/Geometry>
+/*
 #define CAMERA_MOVE_SPEED			0.05f			//
 #define CAMERA_ROTATE_SPEED			20.0f			//20 deg per 100 pixel
 #define VIEWER_WIDTH				1920.0f
@@ -45,7 +46,7 @@ void SpecialKeys(int key, int x, int y);
 Viewer viewer;
 
 
-/*void ReadStlModel()
+void ReadStlModel()
 {
 	//ifstream infile("C:\\Users\\FrankFang\\Desktop\\stl.txt");  
 	std::ifstream infile("C:\\Users\\FrankFang\\Desktop\\mode.stl");
@@ -89,7 +90,8 @@ Viewer viewer;
 		infile >> temp;
 		infile >> temp;
 	}//while()  
-}*/
+}
+
 void SaveAsBMP(const char *fileName)
 {
 	FILE *file;
@@ -136,6 +138,7 @@ void SaveAsBMP(const char *fileName)
 	free(data);
 	fclose(file);
 }
+
 void Display(void)
 {
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -352,8 +355,10 @@ void ChangeSize(int w, int h)
 	glLoadIdentity();
 	gluLookAt(0.0, 0.0, 5.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0);
 }
+*/
 int main(int argc, char* argv[])
 {
+	/*
 	// Load input file into a PointCloud<T> with an appropriate type
 	pcl::PCLPointCloud2 cloud_blob;
 	pcl::io::loadPCDFile("../file/bunny.pcd", cloud_blob);
@@ -412,5 +417,7 @@ int main(int argc, char* argv[])
 	glutDisplayFunc(Display);
 
 	glutMainLoop();
+	*/
+	system("pause");
 	return 0;
 }
