@@ -15,8 +15,11 @@ enum PlayMode {Once,OnceKeepCache, Loop};
 class Viewer
 {
 private:
-	pcl::Vector3fMap location;
-	pcl::Vector3fMap look;
+	GLfloat theta;
+	GLfloat phi;
+	GLfloat radius;
+	Eigen::Vector3f location;
+	Eigen::Vector3f look;
 public:
 	Viewer();
 	void Mouse(int button, int state, int x, int y);
@@ -31,7 +34,5 @@ public:
 	void ratation(GLfloat theta, GLfloat phi);
 	void moveAroud(GLfloat theta, GLfloat phi);
 	void screenshot(std::string fileName);
-	void play(PlayMode mode);
-
 };
 #endif // VIEWER_H
