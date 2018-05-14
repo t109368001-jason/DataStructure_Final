@@ -1,15 +1,12 @@
 #include "viewer.h"
 Viewer::Viewer()
 {
-	/*
-	GLfloat lookPhi = 0.0;
-	GLfloat lookTheta = M_PI_2;
-	GLfloat textDeltaPhi = -M_PI / 18.0;
-	GLfloat textDeltaTheta = M_PI / 18.0;
-
-	GLfloat lookX = 0.0f, lookZ = -1.0f, lookY = 0.0;
-	GLfloat cameraX = 0.0f, cameraZ = 1.0f, cameraY = 0.0f;
-	*/
+	this->location.setRadius(1.0);
+	this->location.setTheta(M_PI_2);
+	this->location.setPhi(0.0);
+	this->look.setRadius(1.0);
+	this->look.setTheta(M_PI_2);
+	this->look.setPhi(M_PI);
 }
 void Viewer::Mouse(int button, int state, int x, int y)
 {
@@ -18,12 +15,12 @@ void Viewer::Mouse(int button, int state, int x, int y)
 	{
 	case GLUT_LEFT_BUTTON:			//Mouse left buttton
 		if (state == GLUT_UP) {
-			xClick = -1;
-			yClick = -1;
+			this->xClick = -1;
+			this->yClick = -1;
 		}
 		else {
-			xClick = x;
-			yClick = y;
+			this->xClick = x;
+			this->yClick = y;
 		}
 		break;
 	case GLUT_MIDDLE_BUTTON:		//Mouse middle button
@@ -34,14 +31,9 @@ void Viewer::Mouse(int button, int state, int x, int y)
 		break;
 	case 3:							//Mouse scroll up
 
-		cameraX += lookX * CAMERA_MOVE_SPEED;
-		cameraZ += lookZ * CAMERA_MOVE_SPEED;
-		cameraY += lookY * CAMERA_MOVE_SPEED;
 		break;
 	case 4:							//Mouse scroll down
-		cameraX -= lookX * CAMERA_MOVE_SPEED;
-		cameraZ -= lookZ * CAMERA_MOVE_SPEED;
-		cameraY -= lookY * CAMERA_MOVE_SPEED;
+
 		break;
 	default:
 		std::cout << "Mouse : " << button << "\tState : " << state << std::endl;
@@ -51,66 +43,10 @@ void Viewer::Mouse(int button, int state, int x, int y)
 }
 void Viewer::mouseMove(int x, int y)
 {
-	GLfloat radius;
-	GLfloat theta;
-	GLfloat deltaTheta;
-	GLfloat deltaPhi;
-	GLfloat phi;
-	GLfloat movedTheta;
-	GLfloat movedPhi;
-
-	radius = sqrtf(cameraZ * cameraZ + cameraX * cameraX + cameraY * cameraY);
-	theta = atan(sqrtf(cameraZ * cameraZ + cameraX * cameraX) / cameraY);
-	phi = atan(cameraX / cameraZ);
-	if (fixPhi == true)phi += M_PI;
-	if (fixTheta == true)theta += M_PI;
-	deltaTheta = ((yClick - y) / 100.0 * CAMERA_ROTATE_SPEED) * M_PI / 180.0;
-	deltaPhi = ((xClick - x) / 100.0 * CAMERA_ROTATE_SPEED) * M_PI / 180.0;
-
-	if (((theta + deltaTheta) > M_PI) || ((theta + deltaTheta) < 0))
-	{
-		deltaTheta = 0;
-	}
-	movedTheta = theta + deltaTheta;
-	movedPhi = phi + deltaPhi;
-
-
-	cameraZ = radius * sin(movedTheta) * cos(movedPhi);
-	cameraX = radius * sin(movedTheta) * sin(movedPhi);
-	cameraY = radius * cos(movedTheta);
-
-	if ((fabs(theta) < M_PI_2) && (fabs(movedTheta) > M_PI_2))
-	{
-		fixTheta = true;
-	}
-	if ((fabs(theta) > M_PI_2) && (fabs(movedTheta) < M_PI_2))
-	{
-		fixTheta = false;
-	}
-	if ((fabs(phi) < M_PI_2) && (fabs(movedPhi) > M_PI_2))
-	{
-		fixPhi = true;
-	}
-	if (((fabs(phi) > M_PI_2) && (fabs(movedPhi) < M_PI_2)) || ((fabs(phi) < M_PI + M_PI_2) && (fabs(movedPhi) > M_PI + M_PI_2)))
-	{
-		fixPhi = false;
-	}
-
-	xClick = x;
-	yClick = y;
-	lookTheta -= deltaTheta;
-	lookPhi -= deltaPhi;
-	lookZ = -sin(lookTheta)*cos(lookPhi);
-	lookX = sin(lookTheta)*sin(lookPhi);
-	lookY = cos(lookTheta);
-	glutPostRedisplay();
+	this->rotation(((yClick - y) / 100.0 * CAMERA_ROTATE_SPEED) * M_PI / 180.0, ((xClick - x) / 100.0 * CAMERA_ROTATE_SPEED) * M_PI / 180.0);
 }
 void Viewer::ChangeSize(int w, int h)
 {
-	GLfloat fAspect;
-	pcl::PointXYZ x;
-	centroid.get(x);
-
 	if (h == 0)
 		h = 1;
 	glViewport(0, 0, (GLsizei)w, (GLsizei)h);
@@ -132,18 +68,19 @@ void Viewer::Display(void)
 	glLoadIdentity();
 	xClick = 0;
 	mouseMove(5, 0);
-	gluLookAt(cameraX, cameraY, cameraZ, cameraX + lookX, cameraY + lookY, cameraZ + lookZ, 0.0f, 1.0f, 0.0f);
 
-	viewer.draw(triangle, false);
+	gluLookAt(this->location.getX(), this->location.getY(), this->location.getZ(), this->location.getX() + this->look.getX(), this->location.getY() + this->look.getY(), this->location.getZ() + this->look.getZ(), 0.0f, 1.0f, 0.0f);
 
-	viewer.draw(10, 64, "W S A D : Move camera");
-	viewer.draw(10, 48, "Up Down Left Right : Rotate camera");
-	viewer.draw(10, 32, "Mouse drag : Rotate object");
-	viewer.draw(10, 16, "Mouse scroll : Zoom");
+	//viewer.draw(triangle, false);
+
+	this->draw(10, 64, "W S A D : Move camera");
+	this->draw(10, 48, "Up Down Left Right : Rotate camera");
+	this->draw(10, 32, "Mouse drag : Rotate object");
+	this->draw(10, 16, "Mouse scroll : Zoom");
 
 
 	glutSwapBuffers();
-
+	/*
 	if (filename < 2)
 	{
 		std::stringstream ss;
@@ -152,37 +89,37 @@ void Viewer::Display(void)
 		ss << ".bmp";
 		SaveAsBMP(&(*ss.str().begin()));
 		glutPostRedisplay();
-	}
+	}*/
 }
 void Viewer::Keyboard(unsigned char key, int x, int y)
 {
 	GLfloat fraction = CAMERA_MOVE_SPEED;
-	GLfloat xTemp = cameraX, zTemp = cameraZ;
 	switch (key)
 	{
 	case 'w':
-		cameraX += lookX * CAMERA_MOVE_SPEED;
-		cameraZ += lookZ * CAMERA_MOVE_SPEED;
-		cameraY += lookY * CAMERA_MOVE_SPEED;
+		GLfloat tempX = this->location.getX() + this->look.getX() * CAMERA_MOVE_SPEED;
+		GLfloat tempY = this->location.getY() + this->look.getY() * CAMERA_MOVE_SPEED;
+		GLfloat tempZ = this->location.getZ() + this->look.getZ() * CAMERA_MOVE_SPEED;
+		this->location.setRadius(sqrtf(tempX*tempX + tempY * tempY + tempZ * tempZ));
+		this->location.setTheta(acos(tempY / this->location.getRadius()));
+		this->location.setPhi(atan(tempX / tempZ));
 		break;
 	case 's':
-		cameraX -= lookX * CAMERA_MOVE_SPEED;
-		cameraZ -= lookZ * CAMERA_MOVE_SPEED;
-		cameraY -= lookY * CAMERA_MOVE_SPEED;
+		GLfloat tempX = this->location.getX() - this->look.getX() * CAMERA_MOVE_SPEED;
+		GLfloat tempY = this->location.getY() - this->look.getY() * CAMERA_MOVE_SPEED;
+		GLfloat tempZ = this->location.getZ() - this->look.getZ() * CAMERA_MOVE_SPEED;
+		this->location.setRadius(sqrtf(tempX*tempX + tempY * tempY + tempZ * tempZ));
+		this->location.setTheta(acos(tempY / this->location.getRadius()));
+		this->location.setPhi(atan(tempX / tempZ));
 		break;
 	case 'a':
-		fraction = fmax(fabs(cameraX), fabs(cameraZ)) / CAMERA_MOVE_SPEED;
-		cameraX += -zTemp / fraction;
-		cameraZ += xTemp / fraction;
+
 		break;
 	case 'd':
-		fraction = fmax(fabs(cameraX), fabs(cameraZ)) / CAMERA_MOVE_SPEED;
-		cameraX -= -zTemp / fraction;
-		cameraZ -= xTemp / fraction;
+
 		break;
 	case 'f':
 
-		meshFill = !meshFill;
 		break;
 
 
@@ -196,31 +133,24 @@ void Viewer::SpecialKeys(int key, int x, int y)
 	switch (key)
 	{
 	case GLUT_KEY_LEFT:
-		lookPhi -= 0.1f;
-		lookZ = -sin(lookTheta)*cos(lookPhi);
-		lookX = sin(lookTheta)*sin(lookPhi);
-		lookY = cos(lookTheta);
+		this->look.setPhi(this->look.getPhi() - CAMERA_ROTATE_SPEED * M_PI / 180.0);
 		break;
 	case GLUT_KEY_RIGHT:
-		lookPhi += 0.1f;
-		lookZ = -sin(lookTheta)*cos(lookPhi);
-		lookX = sin(lookTheta)*sin(lookPhi);
-		lookY = cos(lookTheta);
+		this->look.setPhi(this->look.getPhi() + CAMERA_ROTATE_SPEED * M_PI / 180.0);
 		break;
 	case GLUT_KEY_UP:
-		if (lookTheta < (M_PI - 0.1))
-			lookTheta -= 0.1f;
-		lookZ = -sin(lookTheta)*cos(lookPhi);
-		lookX = sin(lookTheta)*sin(lookPhi);
-		lookY = cos(lookTheta);
-		break;
+		this->look.setTheta(this->look.getTheta() - CAMERA_ROTATE_SPEED * M_PI / 180.0);
+		if (this->look.getTheta() < 0.0)
+		{
+			this->look.setTheta(0.0);
+		}
 		break;
 	case GLUT_KEY_DOWN:
-		if (lookTheta > 0.1)
-			lookTheta += 0.1f;
-		lookZ = -sin(lookTheta)*cos(lookPhi);
-		lookX = sin(lookTheta)*sin(lookPhi);
-		lookY = cos(lookTheta);
+		this->look.setTheta(this->look.getTheta() + CAMERA_ROTATE_SPEED * M_PI / 180.0);
+		if (this->look.getTheta() > M_PI)
+		{
+			this->look.setTheta(M_PI);
+		}
 		break;
 	}
 	glutPostRedisplay();
@@ -255,7 +185,7 @@ void Viewer::draw(pcl::PolygonMesh &mesh, BOOL fill)		//Draw mesh
 			GLfloat nX = line1Y * line2Z - line2Y * line1Z;
 			GLfloat nY = line1Z * line2X - line2Z * line1X;
 			GLfloat nZ = line1X * line2Y - line2X * line1Y;
-			GLfloat theta = acos((nX * this->location.x() + nY * this->location.y() + nZ * this->location.z()) / sqrtf(nX*nX + nY * nY + nZ * nZ) / sqrtf(this->location.x() * this->location.x() + this->location.y() *this->location.y() + this->location.z() * this->location.z()));
+			GLfloat theta = acos((nX * this->location.getX() + nY * this->location.getY() + nZ * this->location.getZ()) / sqrtf(nX*nX + nY * nY + nZ * nZ) / sqrtf(this->location.getX() * this->location.getX() + this->location.getY() *this->location.getY() + this->location.getZ() * this->location.getZ()));
 			if (acos((nX * cloud->points[mesh.polygons[i].vertices[0]].x + nY * cloud->points[mesh.polygons[i].vertices[0]].y + nZ * cloud->points[mesh.polygons[i].vertices[0]].z) / sqrtf(nX * nX + nY * nY + nZ * nZ) / sqrtf(cloud->points[mesh.polygons[i].vertices[0]].x * cloud->points[mesh.polygons[i].vertices[0]].x + cloud->points[mesh.polygons[i].vertices[0]].y * cloud->points[mesh.polygons[i].vertices[0]].y + cloud->points[mesh.polygons[i].vertices[0]].z * cloud->points[mesh.polygons[i].vertices[0]].z)) < M_PI_2)
 			{
 				theta = (M_PI - theta);
@@ -307,14 +237,16 @@ void Viewer::draw(GLfloat x, GLfloat y, std::string s)		//Draw text
 }
 void Viewer::rotation(GLfloat deltaTheta, GLfloat deltaPhi)
 {
-	if (lookTheta < (M_PI - 0.1))
-		lookTheta -= deltaTheta;
-	if (lookTheta > 0.1)
-		lookTheta += deltaTheta;
-	lookPhi += deltaPhi;
-	lookZ = -sin(lookTheta)*cos(lookPhi);
-	lookX = sin(lookTheta)*sin(lookPhi);
-	lookY = cos(lookTheta);
+	this->location.setTheta(this->location.getTheta() + deltaTheta);
+	this->location.setPhi(this->location.getPhi() + deltaPhi);
+	if (this->location.getTheta() < 0.0)
+	{
+		this->location.setTheta(0.0);
+	}
+	if (this->location.getTheta() > M_PI)
+	{
+		this->location.setTheta(M_PI);
+	}
 }
 void Viewer::moveAroud(GLfloat deltaTheta, GLfloat deltaPhi)
 {
@@ -348,7 +280,7 @@ void Viewer::screenshot(std::string fileName)
 	data[imageSize - 1] = 0;
 	data[imageSize - 2] = 0;
 	glReadBuffer(lastBuffer);
-	file = fopen(fileName, "wb");
+	file = fopen(&(*fileName.begin()), "wb");
 	bmih.biSize = 40;
 	bmih.biWidth = viewPort[2];
 	bmih.biHeight = viewPort[3];
@@ -365,8 +297,4 @@ void Viewer::screenshot(std::string fileName)
 	fwrite(data, imageSize, 1, file);
 	free(data);
 	fclose(file);
-}
-void Viewer::play(PlayMode mode)
-{
-
 }
