@@ -67,11 +67,12 @@ void ReadStlModel()
 
 int main(int argc, char* argv[])
 {
-	/*
+
 
 	pcl::PointCloud<pcl::PointXYZ>::Ptr cloud(new pcl::PointCloud<pcl::PointXYZ>);
 	pcl::PolygonMesh triangle;
-	// Load input file into a PointCloud<T> with an appropriate type
+
+	/*	// Load input file into a PointCloud<T> with an appropriate type
 	pcl::PCLPointCloud2 cloud_blob;
 	pcl::io::loadPCDFile("../file/bunny.pcd", cloud_blob);
 	pcl::fromPCLPointCloud2(cloud_blob, *cloud);

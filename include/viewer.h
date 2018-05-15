@@ -90,6 +90,7 @@ private:
 	GLfloat yClick;
 public:
 	Viewer();
+    std::queue<pcl::PolygonMesh> Buffer;
 	void Mouse(int button, int state, int x, int y);
 	void mouseMove(int x, int y);
 	void ChangeSize(int w, int h);
