@@ -151,3 +151,18 @@ void Viewer::screenshot(std::string fileName)
 	free(data);
 	fclose(file);
 }
+void Viewer::play(PlayMode mode)
+{
+	if (mode == Once)
+	{
+
+	}
+	else if (mode == OnceKeepCache)
+	{
+
+	}
+	else if (mode == Loop)
+	{
+
+	}
+}

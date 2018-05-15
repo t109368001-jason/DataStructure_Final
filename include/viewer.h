@@ -52,7 +52,7 @@ public:
 	{
 		this->radius = v.norm();
 		this->theta = acos(v.dot(Eigen::Vector3f::UnitZ()) / v.norm() / Eigen::Vector3f::UnitZ().norm());
-		this->phi = Eigen::Vector3f(v.dot(Eigen::Vector3f::UnitX()),v.dot(Eigen::Vector3f::UnitY()), 0).dot(Eigen::Vector3f::UnitX())/v.norm()/ Eigen::Vector3f(v.dot(Eigen::Vector3f::UnitX()), v.dot(Eigen::Vector3f::UnitY()), 0).norm();
+		this->phi = Eigen::Vector3f(v.dot(Eigen::Vector3f::UnitX()), v.dot(Eigen::Vector3f::UnitY()), 0).dot(Eigen::Vector3f::UnitX()) / v.norm() / Eigen::Vector3f(v.dot(Eigen::Vector3f::UnitX()), v.dot(Eigen::Vector3f::UnitY()), 0).norm();
 	}
 	void fixTheta()
 	{
@@ -67,6 +67,8 @@ public:
 	}
 };
 
+enum PlayMode { Once, OnceKeepCache, Loop };
+
 class Viewer
 {
 public:
@@ -74,14 +76,15 @@ public:
 	Sphere look;
 	GLfloat xClick;
 	GLfloat yClick;
+	std::queue<pcl::PolygonMesh> Buffer;
 	Viewer();
-    std::queue<pcl::PolygonMesh> Buffer;
 	void draw(pcl::PointCloud<pcl::PointXYZ>::Ptr cloud);		// Draw point cloud
 	void draw(pcl::PolygonMesh &mesh, BOOL fill);							// Draw mesh
 	void draw(GLfloat x, GLfloat y, std::string s);				// Draw caption
 	void rotation(GLfloat theta, GLfloat phi);
 	void moveAroud(GLfloat theta, GLfloat phi);
 	void screenshot(std::string fileName);
+	void Viewer::play(PlayMode mode);
 
 };
 #endif // VIEWER_H
