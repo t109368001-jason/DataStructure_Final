@@ -14,7 +14,7 @@
 #define CAMERA_ROTATE_SPEED		10.0f
 #define CAMERA_ROTATE_PRE_PIXEL	50.0f
 
-enum PlayMode {Once,OnceKeepCache, Loop};
+enum PlayMode { Once, OnceKeepCache, Loop };
 
 class Sphere
 {
