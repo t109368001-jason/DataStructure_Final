@@ -90,9 +90,12 @@ void Viewer::draw(GLfloat x, GLfloat y, std::string s)		//Draw text
 }
 void Viewer::rotation(GLfloat vertical, GLfloat horizontal)
 {
-	this->look.theta += vertical * CAMERA_ROTATE_SPEED * M_PI / 180.0;
+	if (this->look.checkTheta(vertical * CAMERA_ROTATE_SPEED * M_PI / 180.0))
+	{
+
+		this->look.theta += vertical * CAMERA_ROTATE_SPEED * M_PI / 180.0;
+	}
 	this->look.phi += horizontal * CAMERA_ROTATE_SPEED * M_PI / 180.0;
-	this->look.fixTheta();
 }
 void Viewer::move(ModeDirection direction)
 {
@@ -116,9 +119,11 @@ void Viewer::moveAroud(GLfloat newX, GLfloat newY)
 {
 	GLfloat horizontal = (this->xClick - newX) / CAMERA_ROTATE_PRE_PIXEL;
 	GLfloat vertical = (this->yClick - newY) / CAMERA_ROTATE_PRE_PIXEL;
-	this->location.theta += vertical * CAMERA_ROTATE_SPEED * M_PI / 180.0;
+	if (this->location.checkTheta(vertical * CAMERA_ROTATE_SPEED * M_PI / 180.0))
+	{
+		this->location.theta += vertical * CAMERA_ROTATE_SPEED * M_PI / 180.0;
+	}
 	this->location.phi += horizontal * CAMERA_ROTATE_SPEED * M_PI / 180.0;
-	this->location.fixTheta();
 	this->rotation(-vertical, horizontal);
 	this->xClick = newX;
 	this->yClick = newY;
@@ -168,6 +173,7 @@ void Viewer::screenshot(std::string fileName)
 	fwrite(data, imageSize, 1, file);
 	free(data);
 	fclose(file);
+<<<<<<< HEAD
 }
 void Viewer::play(PlayMode mode)
 {
@@ -183,4 +189,6 @@ void Viewer::play(PlayMode mode)
 	{
 
 	}
+=======
+>>>>>>> master
 }

@@ -16,11 +16,11 @@
 #define VIEWER_WIDTH 1024.0f
 #define VIEWER_HEIGHT 768.0f
 
+pcl::PointCloud<pcl::PointXYZ>::Ptr cloud(new pcl::PointCloud<pcl::PointXYZ>);
 pcl::PolygonMesh triangle;
 std::stringstream fileName;
 
 Viewer *viewer = new Viewer;
-//pcl::PolygonMesh triangle;
 
 void Mouse(int button, int state, int x, int y);
 void mouseMove(int x, int y);
@@ -79,13 +79,12 @@ void ReadStlModel()
 
 int main(int argc, char* argv[])
 {
-	pcl::PointCloud<pcl::PointXYZ>::Ptr cloud(new pcl::PointCloud<pcl::PointXYZ>);
-	pcl::PolygonMesh triangle;
-	viewer->Buffer.push(triangle);
+	//pcl::PolygonMesh triangle;
+	//viewer->Buffer.push(triangle);
 	pcl::PCLPointCloud2 cloud_blob;
-	pcl::io::loadPCDFile("../file/bunny.pcd", cloud_blob);
+	pcl::io::loadPCDFile("../file/test2.pcd", cloud_blob);
 	pcl::fromPCLPointCloud2(cloud_blob, *cloud);
-	viewer->Buffer.push(triangle);
+	//viewer->Buffer.push(triangle);
 	//* the data should be available in cloud
 
 	// Normal estimation*
@@ -112,12 +111,12 @@ int main(int argc, char* argv[])
 	pcl::GreedyProjectionTriangulation<pcl::PointNormal> gp3;
 
 	// Set the maximum distance between connected points (maximum edge length)
-	gp3.setSearchRadius(0.025);
+	gp3.setSearchRadius(0.25);
 
 	// Set typical values for the parameters
 	gp3.setMu(2.5);
 	gp3.setMaximumNearestNeighbors(10);
-	gp3.setMaximumSurfaceAngle(M_PI / 4); // 45 degrees
+	gp3.setMaximumSurfaceAngle(M_PI / 2); // 45 degrees
 	gp3.setMinimumAngle(M_PI / 18); // 10 degrees
 	gp3.setMaximumAngle(2 * M_PI / 3); // 120 degrees
 	gp3.setNormalConsistency(false);
@@ -164,8 +163,10 @@ void Display(void)
 	std::cout << viewer->look.phi << "\t";
 	std::cout << std::endl;
 	std::cout << std::endl;
-	viewer->draw(viewer->Buffer.pop, false);
+	//viewer->draw(viewer->Buffer.pop, false);
 
+	viewer->draw(triangle,false);
+	viewer->draw(cloud);
 
 	viewer->draw(10, 64, "W S A D : Move camera");
 	viewer->draw(10, 48, "Up Down Left Right : Rotate camera");

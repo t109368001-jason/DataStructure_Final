@@ -34,16 +34,17 @@ void Sphere::set(Eigen::Vector3f v)
 	this->theta = acos(v.dot(Eigen::Vector3f::UnitZ()) / v.norm() / Eigen::Vector3f::UnitZ().norm());
 	this->phi = atan(v[1] / v[0]);
 	if (v[0] < 0.0)
-		this->phi = -this->phi;
+		this->phi += M_PI;
 }
-void Sphere::fixTheta()
+BOOL Sphere::checkTheta(GLfloat deltaTheta)
 {
-	if (this->theta < 0.0)
+	if ((this->theta + deltaTheta) < 0.0)
 	{
-		this->theta = 0.0;
+		return false;
 	}
-	if (this->theta > M_PI)
+	if ((this->theta + deltaTheta) > M_PI)
 	{
-		this->theta = M_PI;
+		return false;
 	}
+	return true;
 }
