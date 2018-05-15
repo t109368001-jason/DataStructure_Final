@@ -76,6 +76,15 @@ public:
 	GLfloat yClick;
 	Viewer();
     std::queue<pcl::PolygonMesh> Buffer;
+<<<<<<< master
+=======
+	void Mouse(int button, int state, int x, int y);
+	void mouseMove(int x, int y);
+	void ChangeSize(int w, int h);
+	void Display(void);
+	void Keyboard(unsigned char key, int x, int y);
+	void SpecialKeys(int key, int x, int y);
+>>>>>>> Buffer
 	void draw(pcl::PointCloud<pcl::PointXYZ>::Ptr cloud);		// Draw point cloud
 	void draw(pcl::PolygonMesh &mesh, BOOL fill);							// Draw mesh
 	void draw(GLfloat x, GLfloat y, std::string s);				// Draw caption
