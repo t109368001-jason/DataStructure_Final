@@ -173,7 +173,6 @@ void Viewer::screenshot(std::string fileName)
 	fwrite(data, imageSize, 1, file);
 	free(data);
 	fclose(file);
-<<<<<<< HEAD
 }
 void Viewer::play(PlayMode mode)
 {
@@ -189,6 +188,4 @@ void Viewer::play(PlayMode mode)
 	{
 
 	}
-=======
->>>>>>> master
 }
