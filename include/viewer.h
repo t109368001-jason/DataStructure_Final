@@ -75,11 +75,15 @@ public:
 	GLfloat xClick;
 	GLfloat yClick;
 	Viewer();
+<<<<<<< HEAD
 <<<<<<< master
 <<<<<<< refs/remotes/origin/master
 =======
 =======
 >>>>>>> Buffer
+=======
+<<<<<<< HEAD
+>>>>>>> Rayz_branch
     std::queue<pcl::PolygonMesh> Buffer;
 	void Mouse(int button, int state, int x, int y);
 	void mouseMove(int x, int y);
@@ -87,7 +91,12 @@ public:
 	void Display(void);
 	void Keyboard(unsigned char key, int x, int y);
 	void SpecialKeys(int key, int x, int y);
+<<<<<<< HEAD
 >>>>>>> Buffer
+=======
+=======
+>>>>>>> master
+>>>>>>> Rayz_branch
 	void draw(pcl::PointCloud<pcl::PointXYZ>::Ptr cloud);		// Draw point cloud
 	void draw(pcl::PolygonMesh &mesh, BOOL fill);							// Draw mesh
 	void draw(GLfloat x, GLfloat y, std::string s);				// Draw caption
