@@ -19,7 +19,7 @@
 std::stringstream fileName;
 
 Viewer *viewer = new Viewer;
-pcl::PolygonMesh triangle;
+//pcl::PolygonMesh triangle;
 
 void Mouse(int button, int state, int x, int y);
 void mouseMove(int x, int y);
@@ -79,7 +79,8 @@ void ReadStlModel()
 int main(int argc, char* argv[])
 {
 	pcl::PointCloud<pcl::PointXYZ>::Ptr cloud(new pcl::PointCloud<pcl::PointXYZ>);
-	//pcl::PolygonMesh triangle;
+	pcl::PolygonMesh triangle;
+	viewer->Buffer.push(triangle);
 	pcl::PCLPointCloud2 cloud_blob;
 	pcl::io::loadPCDFile("../file/bunny.pcd", cloud_blob);
 	pcl::fromPCLPointCloud2(cloud_blob, *cloud);
