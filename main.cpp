@@ -20,7 +20,7 @@ Viewer viewer;
 /*
 void ReadStlModel()
 {
-	//ifstream infile("C:\\Users\\FrankFang\\Desktop\\stl.txt");  
+	//ifstream infile("C:\\Users\\FrankFang\\Desktop\\stl.txt");
 	std::ifstream infile("C:\\Users\\FrankFang\\Desktop\\mode.stl");
 	if (!infile.is_open())
 	{
@@ -42,26 +42,26 @@ void ReadStlModel()
 	infile >> temp;
 	while (temp.compare("facet") == 0)
 	{
-		trinumber++;//三角形数目  
-		infile >> temp;//get rid of "normal "  
+		trinumber++;//三角形数目
+		infile >> temp;//get rid of "normal "
 		infile >> tempTriAngle.NormDir.x;
 		infile >> tempTriAngle.NormDir.y;
 		infile >> tempTriAngle.NormDir.z;
 
-		infile.getline(dump, 256); infile.getline(dump, 256);//get rid of "outer loop"  
+		infile.getline(dump, 256); infile.getline(dump, 256);//get rid of "outer loop"
 		for (int i = 0; i<3; i++)
 		{
 			infile >> temp;
 			infile >> tempTriAngle.vertex[i].x;
 			infile >> tempTriAngle.vertex[i].y;
 			infile >> tempTriAngle.vertex[i].z;
-			//tempTriAngle.push_back(temppoint[i]);  
+			//tempTriAngle.push_back(temppoint[i]);
 		}
 		TrangleVector.push_back(tempTriAngle);
 		infile >> temp;
 		infile >> temp;
 		infile >> temp;
-	}//while()  
+	}//while()
 }
 */
 

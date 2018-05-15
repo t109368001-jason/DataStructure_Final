@@ -215,7 +215,7 @@ void Viewer::draw(GLfloat x, GLfloat y, std::string s)		//Draw text
 	glMatrixMode(GL_PROJECTION);
 	glPushMatrix();
 	glLoadIdentity();
-	gluOrtho2D(0.0, glutGet(GLUT_WINDOW_WIDTH) , 0.0, glutGet(GLUT_WINDOW_HEIGHT));
+	gluOrtho2D(0.0, glutGet(GLUT_WINDOW_WIDTH), 0.0, glutGet(GLUT_WINDOW_HEIGHT));
 	glMatrixMode(GL_MODELVIEW);
 	glLoadIdentity();
 	glColor3f(1.0f, 1.0f, 1.0f);//needs to be called before RasterPos
