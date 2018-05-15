@@ -16,7 +16,7 @@ public:
 	GLfloat getZ();
 	Eigen::Vector3f getVector();
 	void set(Eigen::Vector3f v);
-	void fixTheta();
+	BOOL checkTheta(GLfloat deltaTheta);
 };
 
 #endif // SPHERE_H
