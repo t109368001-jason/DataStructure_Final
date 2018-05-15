@@ -163,7 +163,7 @@ void Display(void)
 	std::cout << std::endl;
 	std::cout << std::endl;
 	viewer->draw(viewer->Buffer.pop, false);
-	//viewer->play();
+
 
 	viewer->draw(10, 64, "W S A D : Move camera");
 	viewer->draw(10, 48, "Up Down Left Right : Rotate camera");
@@ -228,6 +228,10 @@ void Keyboard(unsigned char key, int x, int y)
 	case 'f':
 
 		break;
+	//case '1':   viewer->play(Once);			 break;
+	//case '2':   viewer->play(OnceKeepCache);   break;
+	//case '3':   viewer->play(Loop);		  	 break;
+
 	default:	printf("   Keyboard %c == %d\n", key, key);	break;
 
 	}

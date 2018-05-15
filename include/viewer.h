@@ -10,19 +10,13 @@
 #define CAMERA_ROTATE_SPEED		10.0f
 #define CAMERA_ROTATE_PRE_PIXEL	50.0f
 
-enum PlayMode { Once, OnceKeepCache, Loop };
-<<<<<<< HEAD
-
 class Sphere
 {
 public:
 	GLfloat radius;
 	GLfloat theta;
 	GLfloat phi;
-	Sphere()
-	{
 
-	}
 	Sphere(GLfloat radius, GLfloat theta, GLfloat phi)
 	{
 		this->radius = radius;
@@ -63,10 +57,8 @@ public:
 		}
 	}
 };
-=======
-enum ModeDirection { Forward, Backward, Left, Right };
->>>>>>> master
 
+enum ModeDirection { Forward, Backward, Left, Right };
 enum PlayMode { Once, OnceKeepCache, Loop };
 
 class Viewer
@@ -85,7 +77,7 @@ public:
 	void move(ModeDirection direction);
 	void moveAroud(GLfloat theta, GLfloat phi);
 	void screenshot(std::string fileName);
-	void Viewer::play(PlayMode mode);
+	void play(PlayMode mode);
 
 };
 #endif // VIEWER_H

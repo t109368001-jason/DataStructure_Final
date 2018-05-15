@@ -96,7 +96,7 @@ void Viewer::rotation(GLfloat vertical, GLfloat horizontal)
 }
 void Viewer::move(ModeDirection direction)
 {
-	Eigen::Vector3f shift(0.0,0.0,0.0);
+	Eigen::Vector3f shift(0.0, 0.0, 0.0);
 	switch (direction)
 	{
 	case Forward:
@@ -173,7 +173,10 @@ void Viewer::play(PlayMode mode)
 {
 	if (mode == Once)
 	{
-
+		if (this->Buffer == this->Buffer.back)
+		{
+			this->Buffer = 
+		}
 	}
 	else if (mode == OnceKeepCache)
 	{
