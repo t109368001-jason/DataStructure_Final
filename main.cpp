@@ -80,10 +80,10 @@ int main(int argc, char* argv[])
 {
 	pcl::PointCloud<pcl::PointXYZ>::Ptr cloud(new pcl::PointCloud<pcl::PointXYZ>);
 	pcl::PolygonMesh triangle;
-	viewer->Buffer.push(triangle);
 	pcl::PCLPointCloud2 cloud_blob;
 	pcl::io::loadPCDFile("../file/bunny.pcd", cloud_blob);
 	pcl::fromPCLPointCloud2(cloud_blob, *cloud);
+	viewer->Buffer.push(triangle);
 	//* the data should be available in cloud
 
 	// Normal estimation*
@@ -162,7 +162,8 @@ void Display(void)
 	std::cout << viewer->look.phi << "\t";
 	std::cout << std::endl;
 	std::cout << std::endl;
-	viewer->draw(triangle, false);
+	viewer->draw(viewer->Buffer.pop, false);
+
 
 	viewer->draw(10, 64, "W S A D : Move camera");
 	viewer->draw(10, 48, "Up Down Left Right : Rotate camera");
@@ -227,6 +228,10 @@ void Keyboard(unsigned char key, int x, int y)
 	case 'f':
 
 		break;
+	//case '1':   viewer->play(Once);			 break;
+	//case '2':   viewer->play(OnceKeepCache);   break;
+	//case '3':   viewer->play(Loop);		  	 break;
+
 	default:	printf("   Keyboard %c == %d\n", key, key);	break;
 
 	}
