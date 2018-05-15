@@ -7,6 +7,9 @@
     <ClCompile Include="..\include\viewer.cpp">
       <Filter>include</Filter>
     </ClCompile>
+    <ClCompile Include="..\include\sphere.cpp">
+      <Filter>include</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="C:\Users\XIAO\OneDrive\文件\c\DataStructure_Final\CMakeLists.txt" />
@@ -24,6 +27,9 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\include\viewer.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\sphere.h">
       <Filter>include</Filter>
     </ClInclude>
   </ItemGroup>

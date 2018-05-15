@@ -163,11 +163,10 @@ void Display(void)
 	std::cout << std::endl;
 	viewer->draw(triangle, false);
 
-	viewer->draw(10, 64, "W S A D : Move camera");
+	viewer->draw(10, 64, "W S : Move camera");
 	viewer->draw(10, 48, "Up Down Left Right : Rotate camera");
 	viewer->draw(10, 32, "Mouse drag : Rotate object");
 	viewer->draw(10, 16, "Mouse scroll : Zoom");
-
 
 	glutSwapBuffers();
 }
@@ -204,15 +203,9 @@ void Mouse(int button, int state, int x, int y)
 	case GLUT_RIGHT_BUTTON:			//Mouse right button
 
 		break;
-	case 3:							//Mouse scroll up
-
-		break;
-	case 4:							//Mouse scroll down
-
-		break;
-	default:
-		std::cout << "Mouse : " << button << "\tState : " << state << std::endl;
-		break;
+	case 3:		viewer->move(Forward);	break;
+	case 4:		viewer->move(Backward);	break;
+	default:	std::cout << "Mouse : " << button << "\tState : " << state << std::endl;	break;
 	}
 	glutPostRedisplay();
 }
@@ -226,23 +219,14 @@ void Keyboard(unsigned char key, int x, int y)
 	GLfloat fraction = CAMERA_MOVE_SPEED;
 	switch (key)
 	{
-	case 'w':
-		viewer->location.set(viewer->location.getVector() + viewer->look.getVector()*CAMERA_MOVE_SPEED);
-		break;
-	case 's':
-		viewer->location.set(viewer->location.getVector() - viewer->look.getVector()*CAMERA_MOVE_SPEED);
-		break;
-	case 'a':
-		break;
-	case 'd':
-
-		break;
+	case 'w':	viewer->move(Forward);	break;
+	case 's':	viewer->move(Backward);	break;
+	case 'a':	viewer->move(Left);		break;
+	case 'd':	viewer->move(Right);	break;
 	case 'f':
 
 		break;
-
-
-	default: printf("   Keyboard %c == %d\n", key, key);	break;
+	default:	printf("   Keyboard %c == %d\n", key, key);	break;
 
 	}
 	glutPostRedisplay();
@@ -251,18 +235,10 @@ void SpecialKeys(int key, int x, int y)
 {
 	switch (key)
 	{
-	case GLUT_KEY_LEFT:
-		viewer->rotation(0.0, 1.0);
-		break;
-	case GLUT_KEY_RIGHT:
-		viewer->rotation(0.0, -1.0);
-		break;
-	case GLUT_KEY_UP:
-		viewer->rotation(-1.0, 0.0);
-		break;
-	case GLUT_KEY_DOWN:
-		viewer->rotation(1.0, 0.0);
-		break;
+	case GLUT_KEY_LEFT:		viewer->rotation(0.0, 1.0);		break;
+	case GLUT_KEY_RIGHT:	viewer->rotation(0.0, -1.0);	break;
+	case GLUT_KEY_UP:		viewer->rotation(-1.0, 0.0);	break;
+	case GLUT_KEY_DOWN:		viewer->rotation(1.0, 0.0);		break;
 	}
 	glutPostRedisplay();
 }

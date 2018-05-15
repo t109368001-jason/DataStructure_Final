@@ -94,6 +94,24 @@ void Viewer::rotation(GLfloat vertical, GLfloat horizontal)
 	this->look.phi += horizontal * CAMERA_ROTATE_SPEED * M_PI / 180.0;
 	this->look.fixTheta();
 }
+void Viewer::move(ModeDirection direction)
+{
+	Eigen::Vector3f shift(0.0,0.0,0.0);
+	switch (direction)
+	{
+	case Forward:
+		shift = this->look.getVector();
+		break;
+	case Backward:
+		shift = -this->look.getVector();
+		break;
+	case Left:
+		break;
+	case Right:
+		break;
+	}
+	this->location.set(this->location.getVector() + shift);
+}
 void Viewer::moveAroud(GLfloat newX, GLfloat newY)
 {
 	GLfloat horizontal = (this->xClick - newX) / CAMERA_ROTATE_PRE_PIXEL;
