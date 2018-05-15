@@ -16,6 +16,7 @@
 #define VIEWER_WIDTH 1024.0f
 #define VIEWER_HEIGHT 768.0f
 
+pcl::PolygonMesh triangle;
 std::stringstream fileName;
 
 Viewer *viewer = new Viewer;
@@ -79,7 +80,6 @@ void ReadStlModel()
 int main(int argc, char* argv[])
 {
 	pcl::PointCloud<pcl::PointXYZ>::Ptr cloud(new pcl::PointCloud<pcl::PointXYZ>);
-	pcl::PolygonMesh triangle;
 	viewer->Buffer.push(triangle);
 	pcl::PCLPointCloud2 cloud_blob;
 	pcl::io::loadPCDFile("../file/bunny.pcd", cloud_blob);
