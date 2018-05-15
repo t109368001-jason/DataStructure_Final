@@ -78,17 +78,8 @@ void ReadStlModel()
 
 int main(int argc, char* argv[])
 {
-<<<<<<< refs/remotes/origin/master
 	pcl::PointCloud<pcl::PointXYZ>::Ptr cloud(new pcl::PointCloud<pcl::PointXYZ>);
-	// Load input file into a PointCloud<T> with an appropriate type
-=======
-
-
-	pcl::PointCloud<pcl::PointXYZ>::Ptr cloud(new pcl::PointCloud<pcl::PointXYZ>);
-	pcl::PolygonMesh triangle;
-
-	/*	// Load input file into a PointCloud<T> with an appropriate type
->>>>>>> Buffer
+	//pcl::PolygonMesh triangle;
 	pcl::PCLPointCloud2 cloud_blob;
 	pcl::io::loadPCDFile("../file/bunny.pcd", cloud_blob);
 	pcl::fromPCLPointCloud2(cloud_blob, *cloud);
@@ -179,16 +170,6 @@ void Display(void)
 
 
 	glutSwapBuffers();
-	/*
-	if (filename < 2)
-	{
-	std::stringstream ss;
-	ss << "../picture/";
-	ss << filename++;
-	ss << ".bmp";
-	SaveAsBMP(&(*ss.str().begin()));
-	glutPostRedisplay();
-	}*/
 }
 void ChangeSize(int w, int h)
 {
