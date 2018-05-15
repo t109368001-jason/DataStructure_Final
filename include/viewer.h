@@ -75,6 +75,14 @@ public:
 	GLfloat xClick;
 	GLfloat yClick;
 	Viewer();
+<<<<<<< master
+=======
+<<<<<<< master
+<<<<<<< refs/remotes/origin/master
+=======
+=======
+>>>>>>> Buffer
+>>>>>>> Buffer
     std::queue<pcl::PolygonMesh> Buffer;
 <<<<<<< master
 =======
