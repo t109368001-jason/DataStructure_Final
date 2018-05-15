@@ -96,7 +96,7 @@ void Viewer::rotation(GLfloat vertical, GLfloat horizontal)
 }
 void Viewer::move(ModeDirection direction)
 {
-	Eigen::Vector3f shift(0.0,0.0,0.0);
+	Eigen::Vector3f shift(0.0, 0.0, 0.0);
 	switch (direction)
 	{
 	case Forward:
@@ -168,4 +168,22 @@ void Viewer::screenshot(std::string fileName)
 	fwrite(data, imageSize, 1, file);
 	free(data);
 	fclose(file);
+}
+void Viewer::play(PlayMode mode)
+{
+	if (mode == Once)
+	{
+		if (this->Buffer == this->Buffer.back)
+		{
+			this->Buffer = 
+		}
+	}
+	else if (mode == OnceKeepCache)
+	{
+
+	}
+	else if (mode == Loop)
+	{
+
+	}
 }
