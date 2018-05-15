@@ -75,8 +75,11 @@ public:
 	GLfloat xClick;
 	GLfloat yClick;
 	Viewer();
+<<<<<<< master
 <<<<<<< refs/remotes/origin/master
 =======
+=======
+>>>>>>> Buffer
     std::queue<pcl::PolygonMesh> Buffer;
 	void Mouse(int button, int state, int x, int y);
 	void mouseMove(int x, int y);

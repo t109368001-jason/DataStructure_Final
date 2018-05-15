@@ -78,16 +78,22 @@ void ReadStlModel()
 
 int main(int argc, char* argv[])
 {
+<<<<<<< master
 <<<<<<< refs/remotes/origin/master
 	pcl::PointCloud<pcl::PointXYZ>::Ptr cloud(new pcl::PointCloud<pcl::PointXYZ>);
 	// Load input file into a PointCloud<T> with an appropriate type
 =======
+=======
+>>>>>>> Buffer
 
 
 	pcl::PointCloud<pcl::PointXYZ>::Ptr cloud(new pcl::PointCloud<pcl::PointXYZ>);
 	pcl::PolygonMesh triangle;
 
 	/*	// Load input file into a PointCloud<T> with an appropriate type
+<<<<<<< master
+>>>>>>> Buffer
+=======
 >>>>>>> Buffer
 	pcl::PCLPointCloud2 cloud_blob;
 	pcl::io::loadPCDFile("../file/bunny.pcd", cloud_blob);
