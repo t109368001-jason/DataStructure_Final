@@ -1,20 +1,17 @@
 #ifndef VIEWER_H  
 #define VIEWER_H  
 
-//#include <pcl/io/pcd_io.h>
 #include <pcl/point_types.h>
-//#include <pcl/kdtree/kdtree_flann.h>
-//#include <pcl/features/normal_3d.h>
 #include <pcl/surface/gp3.h>
-//#include <gl/GL.h>
-//#include <gl/GLU.h>
 #include <gl/glut.h>
+#include "sphere.h"
 
 #define CAMERA_MOVE_SPEED		0.05f
 #define CAMERA_ROTATE_SPEED		10.0f
 #define CAMERA_ROTATE_PRE_PIXEL	50.0f
 
 enum PlayMode { Once, OnceKeepCache, Loop };
+<<<<<<< HEAD
 
 class Sphere
 {
@@ -66,6 +63,9 @@ public:
 		}
 	}
 };
+=======
+enum ModeDirection { Forward, Backward, Left, Right };
+>>>>>>> master
 
 enum PlayMode { Once, OnceKeepCache, Loop };
 
@@ -82,6 +82,7 @@ public:
 	void draw(pcl::PolygonMesh &mesh, BOOL fill);							// Draw mesh
 	void draw(GLfloat x, GLfloat y, std::string s);				// Draw caption
 	void rotation(GLfloat theta, GLfloat phi);
+	void move(ModeDirection direction);
 	void moveAroud(GLfloat theta, GLfloat phi);
 	void screenshot(std::string fileName);
 	void Viewer::play(PlayMode mode);
