@@ -162,8 +162,7 @@ void Display(void)
 	std::cout << viewer->look.phi << "\t";
 	std::cout << std::endl;
 	std::cout << std::endl;
-	viewer->draw(triangle, false);
-
+	viewer->draw(viewer->Buffer.pop, false);
 	viewer->draw(10, 64, "W S A D : Move camera");
 	viewer->draw(10, 48, "Up Down Left Right : Rotate camera");
 	viewer->draw(10, 32, "Mouse drag : Rotate object");
