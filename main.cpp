@@ -127,7 +127,7 @@ int main(int argc, char* argv[])
 	pcl::GreedyProjectionTriangulation<pcl::PointNormal> gp3;
 
 	// Set the maximum distance between connected points (maximum edge length)
-	gp3.setSearchRadius(0.0025);
+	gp3.setSearchRadius(0.025);
 
 	// Set typical values for the parameters
 	gp3.setMu(2.5);
