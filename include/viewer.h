@@ -3,6 +3,7 @@
 
 #include <pcl/point_types.h>
 #include <pcl/surface/gp3.h>
+#include <pcl/common/centroid.h>
 #include <gl/glut.h>
 #include "sphere.h"
 

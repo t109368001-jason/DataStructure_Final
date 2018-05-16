@@ -320,11 +320,11 @@ if %errorlevel% neq 0 goto :VCEnd</Command>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <None Include="..\file\進度.md" />
-  </ItemGroup>
-  <ItemGroup>
     <ClInclude Include="..\include\sphere.h" />
     <ClInclude Include="..\include\viewer.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\file\進度.md" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

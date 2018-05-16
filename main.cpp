@@ -82,8 +82,24 @@ int main(int argc, char* argv[])
 	//pcl::PolygonMesh triangle;
 	//viewer->Buffer.push(triangle);
 	pcl::PCLPointCloud2 cloud_blob;
-	pcl::io::loadPCDFile("../file/test2.pcd", cloud_blob);
+	pcl::io::loadPCDFile("../file/bunny_high_helf.pcd", cloud_blob);
 	pcl::fromPCLPointCloud2(cloud_blob, *cloud);
+
+
+	pcl::CentroidPoint<pcl::PointXYZ> centroid;
+	pcl::PointXYZ cent;
+	for (size_t i = 0; i < cloud->points.size(); i++)
+	{
+		centroid.add(cloud->points[i]);
+	}
+	centroid.get(cent);
+	//std::cout << cent << std::endl;
+	for (size_t i = 0; i < cloud->points.size(); i++)
+	{
+		cloud->points[i].x -= cent.x;
+		cloud->points[i].y -= cent.y;
+		cloud->points[i].z -= cent.z;
+	}
 	//viewer->Buffer.push(triangle);
 	//* the data should be available in cloud
 
@@ -94,7 +110,7 @@ int main(int argc, char* argv[])
 	tree->setInputCloud(cloud);
 	n.setInputCloud(cloud);
 	n.setSearchMethod(tree);
-	n.setKSearch(20);
+	n.setKSearch(30);
 	n.compute(*normals);
 	//* normals should not contain the point normals + surface curvatures
 
@@ -111,14 +127,14 @@ int main(int argc, char* argv[])
 	pcl::GreedyProjectionTriangulation<pcl::PointNormal> gp3;
 
 	// Set the maximum distance between connected points (maximum edge length)
-	gp3.setSearchRadius(0.25);
+	gp3.setSearchRadius(50);
 
 	// Set typical values for the parameters
 	gp3.setMu(2.5);
-	gp3.setMaximumNearestNeighbors(10);
-	gp3.setMaximumSurfaceAngle(M_PI / 2); // 45 degrees
-	gp3.setMinimumAngle(M_PI / 18); // 10 degrees
-	gp3.setMaximumAngle(2 * M_PI / 3); // 120 degrees
+	gp3.setMaximumNearestNeighbors(300);
+	gp3.setMaximumSurfaceAngle(M_PI / 4); // 45 degrees
+	gp3.setMinimumAngle(M_PI / 36); // 10 degrees
+	gp3.setMaximumAngle(5 * M_PI / 6); // 120 degrees
 	gp3.setNormalConsistency(false);
 
 	// Get result
@@ -146,26 +162,28 @@ void Display(void)
 {
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-	glColor3f(1.0, 1.0, 1.0);
-	glPointSize(1.0);
-	glLineWidth(1.0);
 
 	glLoadIdentity();
 	//viewer->xClick = 0;
 	//mouseMove(5, 0);
 
 	gluLookAt(viewer->location.getY(), viewer->location.getZ(), viewer->location.getX(), viewer->location.getY() + viewer->look.getY(), viewer->location.getZ() + viewer->look.getZ(), viewer->location.getX() + viewer->look.getX(), 0.0f, 1.0f, 0.0f);
-	std::cout << viewer->location.radius << "\t";
+	/*std::cout << viewer->location.radius << "\t";
 	std::cout << viewer->location.theta << "\t";
 	std::cout << viewer->location.phi << "\t";
 	std::cout << viewer->look.radius << "\t";
 	std::cout << viewer->look.theta << "\t";
 	std::cout << viewer->look.phi << "\t";
 	std::cout << std::endl;
-	std::cout << std::endl;
+	std::cout << std::endl;*/
 	//viewer->draw(viewer->Buffer.pop, false);
 
+	glColor3f(1.0, 1.0, 1.0);
+	glLineWidth(1.0);
 	viewer->draw(triangle,false);
+
+	glColor3f(1.0, 1.0, 1.0);
+	glPointSize(1.0);
 	viewer->draw(cloud);
 
 	viewer->draw(10, 64, "W S A D : Move camera");
@@ -186,6 +204,8 @@ void ChangeSize(int w, int h)
 	glMatrixMode(GL_MODELVIEW);
 	glLoadIdentity();
 	gluLookAt(0.0, 0.0, 5.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0);
+
+
 }
 void Mouse(int button, int state, int x, int y)
 {
@@ -229,7 +249,8 @@ void Keyboard(unsigned char key, int x, int y)
 	case 'a':	viewer->move(Left);		break;
 	case 'd':	viewer->move(Right);	break;
 	case 'f':
-
+		viewer->look.theta = M_PI-viewer->location.theta;
+		viewer->look.phi = viewer->location.phi+M_PI;
 		break;
 	//case '1':   viewer->play(Once);			 break;
 	//case '2':   viewer->play(OnceKeepCache);   break;

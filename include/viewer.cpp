@@ -174,18 +174,28 @@ void Viewer::screenshot(std::string fileName)
 	free(data);
 	fclose(file);
 }
-void Viewer::play(PlayMode mode)
+void Viewer::play(PlayMode mode, pcl::PolygonMesh mesh)
 {
+	GLint time = 1;
 	if (mode == Once)
 	{
-		
 	}
 	else if (mode == OnceKeepCache)
 	{
-
+		if (time == 1)
+		{
+			if (this->Buffer.empty == true)
+			{
+				time--;
+				this->Buffer.push(mesh);
+			}
+		}
 	}
 	else if (mode == Loop)
 	{
-
+		if (this->Buffer.empty == true)
+		{
+			this->Buffer.push(mesh);
+		}
 	}
 }
