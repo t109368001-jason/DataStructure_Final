@@ -82,7 +82,7 @@ int main(int argc, char* argv[])
 	//pcl::PolygonMesh triangle;
 	//viewer->Buffer.push(triangle);
 	pcl::PCLPointCloud2 cloud_blob;
-	pcl::io::loadPCDFile("../file/bunny.pcd", cloud_blob);
+	pcl::io::loadPCDFile("../file/bunny_high_helf.pcd", cloud_blob);
 	pcl::fromPCLPointCloud2(cloud_blob, *cloud);
 
 
@@ -110,7 +110,7 @@ int main(int argc, char* argv[])
 	tree->setInputCloud(cloud);
 	n.setInputCloud(cloud);
 	n.setSearchMethod(tree);
-	n.setKSearch(20);
+	n.setKSearch(30);
 	n.compute(*normals);
 	//* normals should not contain the point normals + surface curvatures
 
@@ -127,14 +127,14 @@ int main(int argc, char* argv[])
 	pcl::GreedyProjectionTriangulation<pcl::PointNormal> gp3;
 
 	// Set the maximum distance between connected points (maximum edge length)
-	gp3.setSearchRadius(0.025);
+	gp3.setSearchRadius(50);
 
 	// Set typical values for the parameters
 	gp3.setMu(2.5);
-	gp3.setMaximumNearestNeighbors(10);
+	gp3.setMaximumNearestNeighbors(300);
 	gp3.setMaximumSurfaceAngle(M_PI / 4); // 45 degrees
-	gp3.setMinimumAngle(M_PI / 18); // 10 degrees
-	gp3.setMaximumAngle(2 * M_PI / 3); // 120 degrees
+	gp3.setMinimumAngle(M_PI / 36); // 10 degrees
+	gp3.setMaximumAngle(5 * M_PI / 6); // 120 degrees
 	gp3.setNormalConsistency(false);
 
 	// Get result
@@ -168,14 +168,14 @@ void Display(void)
 	//mouseMove(5, 0);
 
 	gluLookAt(viewer->location.getY(), viewer->location.getZ(), viewer->location.getX(), viewer->location.getY() + viewer->look.getY(), viewer->location.getZ() + viewer->look.getZ(), viewer->location.getX() + viewer->look.getX(), 0.0f, 1.0f, 0.0f);
-	std::cout << viewer->location.radius << "\t";
+	/*std::cout << viewer->location.radius << "\t";
 	std::cout << viewer->location.theta << "\t";
 	std::cout << viewer->location.phi << "\t";
 	std::cout << viewer->look.radius << "\t";
 	std::cout << viewer->look.theta << "\t";
 	std::cout << viewer->look.phi << "\t";
 	std::cout << std::endl;
-	std::cout << std::endl;
+	std::cout << std::endl;*/
 	//viewer->draw(viewer->Buffer.pop, false);
 
 	glColor3f(1.0, 1.0, 1.0);
