@@ -252,9 +252,9 @@ void Keyboard(unsigned char key, int x, int y)
 		viewer->look.theta = M_PI-viewer->location.theta;
 		viewer->look.phi = viewer->location.phi+M_PI;
 		break;
-	//case '1':   viewer->play(Once);			 break;
-	//case '2':   viewer->play(OnceKeepCache);   break;
-	//case '3':   viewer->play(Loop);		  	 break;
+	//case '1':   viewer->play(Once,triangle);			 break;
+	//case '2':   viewer->play(OnceKeepCache,triangle);  break;
+	//case '3':   viewer->play(Loop,triangle);		  	 break;
 
 	default:	printf("   Keyboard %c == %d\n", key, key);	break;
 
