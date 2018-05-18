@@ -157,11 +157,10 @@ int main(int argc, char* argv[])
 	glutMainLoop();
 	return 0;
 }
-
 void Display(void)
 {
+	pcl::PolygonMesh temp;
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
 
 	glLoadIdentity();
 	//viewer->xClick = 0;
@@ -176,11 +175,23 @@ void Display(void)
 	std::cout << viewer->look.phi << "\t";
 	std::cout << std::endl;
 	std::cout << std::endl;*/
-	//viewer->draw(viewer->Buffer.pop, false);
+	viewer->Buffer.push(triangle);
+
+	if (viewer->mode == Start)
+	{
+		temp = viewer->Buffer.pop();
+		viewer->draw(temp, false);
+		viewer->Buffer.push(temp);
+		glutPostRedisplay();
+	}
+	else if (viewer->mode == Stop)
+	{
+
+	}
 
 	glColor3f(1.0, 1.0, 1.0);
 	glLineWidth(1.0);
-	viewer->draw(triangle,false);
+	viewer->draw(triangle, false);
 
 	glColor3f(1.0, 1.0, 1.0);
 	glPointSize(1.0);
@@ -249,12 +260,11 @@ void Keyboard(unsigned char key, int x, int y)
 	case 'a':	viewer->move(Left);		break;
 	case 'd':	viewer->move(Right);	break;
 	case 'f':
-		viewer->look.theta = M_PI-viewer->location.theta;
-		viewer->look.phi = viewer->location.phi+M_PI;
+		viewer->look.theta = M_PI - viewer->location.theta;
+		viewer->look.phi = viewer->location.phi + M_PI;
 		break;
-	//case '1':   viewer->play(Once,triangle);			 break;
-	//case '2':   viewer->play(OnceKeepCache,triangle);  break;
-	//case '3':   viewer->play(Loop,triangle);		  	 break;
+	case '1':   viewer->mode == Start;  break;
+	case '2':   viewer->mode == Stop;   break;
 
 	default:	printf("   Keyboard %c == %d\n", key, key);	break;
 

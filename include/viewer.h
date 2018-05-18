@@ -12,7 +12,8 @@
 #define CAMERA_ROTATE_PRE_PIXEL	50.0f
 
 enum ModeDirection { Forward, Backward, Left, Right };
-enum PlayMode { Once, OnceKeepCache, Loop };
+
+enum PlayMode { Start, Stop };
 
 class Viewer
 {
@@ -21,6 +22,7 @@ public:
 	Sphere look;
 	GLfloat xClick;
 	GLfloat yClick;
+	PlayMode mode;
 	std::queue<pcl::PolygonMesh> Buffer;
 	Viewer();
 	void draw(pcl::PointCloud<pcl::PointXYZ>::Ptr cloud);		// Draw point cloud
@@ -30,7 +32,6 @@ public:
 	void move(ModeDirection direction);
 	void moveAroud(GLfloat theta, GLfloat phi);
 	void screenshot(std::string fileName);
-	void play(PlayMode mode, pcl::PolygonMesh mesh, BOOL fill);
 
 };
 #endif // VIEWER_H
