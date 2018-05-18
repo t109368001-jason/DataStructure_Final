@@ -12,6 +12,7 @@
 #include <gl/glut.h>
 #include <wingdi.h>
 #include "include/viewer.h"
+#include <thread>
 
 #define VIEWER_WIDTH 1024.0f
 #define VIEWER_HEIGHT 768.0f
@@ -140,13 +141,24 @@ void triangulation(pcl::PolygonMesh &triangle, std::string str)
 	gp3.setSearchMethod(tree2);
 	gp3.reconstruct(triangle);
 }
+void t1()
+{
+	while (1)
+	{
+		std::cout << "thread1" << std::endl;
+		Sleep(1000);
+	}
+}
 int main(int argc, char* argv[])
 {
+	HANDLE thread1;
+	DWORD tID1;
+	thread1 = CreateThread(NULL, 0, (LPTHREAD_START_ROUTINE)t1, 0, 0, &tID1);
 	//pcl::PolygonMesh triangle;
 	//viewer->Buffer.push(triangle);
 
 	//triangulation(triangle, "../file/75.pcd");
-	for (size_t i = 50; i <= 100; i += 5)
+	for (size_t i = 50; i < 100; i += 5)
 	{
 		pcl::PolygonMesh triangle;
 		std::stringstream str;
@@ -156,7 +168,7 @@ int main(int argc, char* argv[])
 		triangulation(triangle, str.str());
 		viewer->Buffer.push(triangle);
 	}
-	for (size_t i = 95; i >= 50; i -= 5)
+	for (size_t i = 100; i > 50; i -= 5)
 	{
 		pcl::PolygonMesh triangle;
 		std::stringstream str;
@@ -191,14 +203,6 @@ void Display(void)
 	glLineWidth(1.0);
 
 	gluLookAt(viewer->location.getY(), viewer->location.getZ(), viewer->location.getX(), viewer->location.getY() + viewer->look.getY(), viewer->location.getZ() + viewer->look.getZ(), viewer->location.getX() + viewer->look.getX(), 0.0f, 1.0f, 0.0f);
-	/*std::cout << viewer->location.radius << "\t";
-	std::cout << viewer->location.theta << "\t";
-	std::cout << viewer->location.phi << "\t";
-	std::cout << viewer->look.radius << "\t";
-	std::cout << viewer->look.theta << "\t";
-	std::cout << viewer->look.phi << "\t";
-	std::cout << std::endl;
-	std::cout << std::endl;*/
 
 	if (viewer->mode == Start)
 	{
@@ -208,26 +212,18 @@ void Display(void)
 			viewer->Buffer.pop();
 			viewer->draw(temp, false);
 			viewer->Buffer.push(temp);
-			glutPostRedisplay();
+			viewer->count = clock();
 		}
+		else
+		{
+			viewer->draw(viewer->Buffer.back(), false);
+		}
+		glutPostRedisplay();
 	}
 	else if (viewer->mode == Stop)
 	{
 
 	}
-
-	//glutSolidSphere(1.0, 20, 16);
-	/*glBegin(GL_TRIANGLES);
-	glVertex3f(0.0, 0.0, 0.0);
-	glVertex3f(1.0, 0.0, 0.0);
-	glVertex3f(0.0, 1.0, 0.0);
-	glEnd();*/
-	//viewer->draw(triangle, false);
-
-	//glColor3f(1.0, 1.0, 1.0);
-	//glPointSize(1.0);
-	//viewer->draw(cloud);
-
 	viewer->draw(10, 64, "W S A D : Move camera");
 	viewer->draw(10, 48, "Up Down Left Right : Rotate camera");
 	viewer->draw(10, 32, "Mouse drag : Rotate object");
