@@ -1,3 +1,3 @@
-C:/Users/XIAO/OneDrive/文件/c/DataStructure_Final/XIAO_Project/CMakeFiles/project.dir
-C:/Users/XIAO/OneDrive/文件/c/DataStructure_Final/XIAO_Project/CMakeFiles/ALL_BUILD.dir
-C:/Users/XIAO/OneDrive/文件/c/DataStructure_Final/XIAO_Project/CMakeFiles/ZERO_CHECK.dir
+C:/Users/wesdx/OneDrive/文件/c/DataStructure_Final/XIAO_Project/CMakeFiles/project.dir
+C:/Users/wesdx/OneDrive/文件/c/DataStructure_Final/XIAO_Project/CMakeFiles/ALL_BUILD.dir
+C:/Users/wesdx/OneDrive/文件/c/DataStructure_Final/XIAO_Project/CMakeFiles/ZERO_CHECK.dir

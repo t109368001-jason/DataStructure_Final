@@ -286,3 +286,5 @@ __pycache__/
 *.btm.cs
 *.odx.cs
 *.xsd.cs
+
+XIAO_Project/CMakeFiles/feature_tests\.bin

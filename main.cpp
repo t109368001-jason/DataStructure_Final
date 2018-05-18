@@ -82,7 +82,7 @@ int main(int argc, char* argv[])
 	//pcl::PolygonMesh triangle;
 	//viewer->Buffer.push(triangle);
 	pcl::PCLPointCloud2 cloud_blob;
-	pcl::io::loadPCDFile("../file/bunny.pcd", cloud_blob);
+	pcl::io::loadPCDFile("../file/test3.pcd", cloud_blob);
 	pcl::fromPCLPointCloud2(cloud_blob, *cloud);
 
 
