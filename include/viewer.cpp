@@ -22,8 +22,8 @@ void Viewer::draw(pcl::PolygonMesh &mesh, BOOL fill)		//Draw mesh
 {
 	pcl::PointCloud<pcl::PointXYZ>::Ptr cloud(new pcl::PointCloud<pcl::PointXYZ>);
 	pcl::fromPCLPointCloud2(mesh.cloud, *cloud);
-	
-	for (size_t i = 0; i < mesh.polygons.size(); i++)
+
+	for (size_t i = 0; i < mesh.polygons.size() - 1; ++i)
 	{
 		if (fill)
 		{
@@ -38,18 +38,17 @@ void Viewer::draw(pcl::PolygonMesh &mesh, BOOL fill)		//Draw mesh
 			GLfloat nX = line1Y * line2Z - line2Y * line1Z;
 			GLfloat nY = line1Z * line2X - line2Z * line1X;
 			GLfloat nZ = line1X * line2Y - line2X * line1Y;
-			GLfloat theta = acos((nX * this->look.getX() + nY * this->look.getY() + nZ * this->look.getZ()) / sqrtf(nX*nX + nY * nY + nZ * nZ) / sqrtf(this->look.getX() * this->look.getX() + this->look.getY() *this->look.getY() + this->look.getZ() * this->look.getZ()));
-			if (acos((nX * cloud->points[mesh.polygons[i].vertices[0]].x + nY * cloud->points[mesh.polygons[i].vertices[0]].y + nZ * cloud->points[mesh.polygons[i].vertices[0]].z) / sqrtf(nX * nX + nY * nY + nZ * nZ) / sqrtf(cloud->points[mesh.polygons[i].vertices[0]].x * cloud->points[mesh.polygons[i].vertices[0]].x + cloud->points[mesh.polygons[i].vertices[0]].y * cloud->points[mesh.polygons[i].vertices[0]].y + cloud->points[mesh.polygons[i].vertices[0]].z * cloud->points[mesh.polygons[i].vertices[0]].z)) > M_PI_2)
+			GLfloat theta = acos((nX * this->location.getX() + nY * this->location.getY() + nZ * this->location.getZ()) / sqrtf(nX*nX + nY * nY + nZ * nZ) / sqrtf(this->location.getX() * this->location.getX() + this->location.getY() *this->location.getY() + this->location.getZ() * this->location.getZ()));
+			if (acos((nX * cloud->points[mesh.polygons[i].vertices[0]].x + nY * cloud->points[mesh.polygons[i].vertices[0]].y + nZ * cloud->points[mesh.polygons[i].vertices[0]].z) / sqrtf(nX * nX + nY * nY + nZ * nZ) / sqrtf(cloud->points[mesh.polygons[i].vertices[0]].x * cloud->points[mesh.polygons[i].vertices[0]].x + cloud->points[mesh.polygons[i].vertices[0]].y * cloud->points[mesh.polygons[i].vertices[0]].y + cloud->points[mesh.polygons[i].vertices[0]].z * cloud->points[mesh.polygons[i].vertices[0]].z)) < M_PI_2)
 			{
 				theta = (M_PI - theta);
 			}
 			glColor3f(theta / M_PI, theta / M_PI, theta / M_PI);
+
 			glBegin(GL_TRIANGLES);
-			for (size_t j = 0; j < mesh.polygons[i].vertices.size(); j++)
-				glVertex3f(cloud->points[mesh.polygons[i].vertices[j]].x, cloud->points[mesh.polygons[i].vertices[j]].y, cloud->points[mesh.polygons[i].vertices[j]].z);
-			//glVertex3f(cloud->points[mesh.polygons[i].vertices[0]].x, cloud->points[mesh.polygons[i].vertices[0]].y, cloud->points[mesh.polygons[i].vertices[0]].z);
-			//glVertex3f(cloud->points[mesh.polygons[i].vertices[1]].x, cloud->points[mesh.polygons[i].vertices[1]].y, cloud->points[mesh.polygons[i].vertices[1]].z);
-			//glVertex3f(cloud->points[mesh.polygons[i].vertices[2]].x, cloud->points[mesh.polygons[i].vertices[2]].y, cloud->points[mesh.polygons[i].vertices[2]].z);
+			glVertex3f(cloud->points[mesh.polygons[i].vertices[0]].x, cloud->points[mesh.polygons[i].vertices[0]].y, cloud->points[mesh.polygons[i].vertices[0]].z);
+			glVertex3f(cloud->points[mesh.polygons[i].vertices[1]].x, cloud->points[mesh.polygons[i].vertices[1]].y, cloud->points[mesh.polygons[i].vertices[1]].z);
+			glVertex3f(cloud->points[mesh.polygons[i].vertices[2]].x, cloud->points[mesh.polygons[i].vertices[2]].y, cloud->points[mesh.polygons[i].vertices[2]].z);
 			glEnd();
 		}
 		else
@@ -175,18 +174,29 @@ void Viewer::screenshot(std::string fileName)
 	free(data);
 	fclose(file);
 }
-void Viewer::play(PlayMode mode)
+/*
+void Viewer::play(PlayMode mode, pcl::PolygonMesh mesh, BOOL fill)
 {
+	GLint time = 1;
 	if (mode == Once)
 	{
-		
+		this->draw(this->Buffer.pop, fill);
 	}
 	else if (mode == OnceKeepCache)
 	{
-
+		this->draw(this->Buffer.pop, fill);
+		if (time == 1)
+		{
+			if (this->Buffer.empty == 1)
+			{
+				time--;
+				this->Buffer.push(mesh);
+			}
+		}
 	}
 	else if (mode == Loop)
 	{
-
+		this->draw(this->Buffer.pop, fill);
+		this->Buffer.push(mesh);
 	}
-}
+}*/

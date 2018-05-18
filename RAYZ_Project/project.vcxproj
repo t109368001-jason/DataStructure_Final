@@ -313,6 +313,7 @@ if %errorlevel% neq 0 goto :VCEnd</Command>
     </CustomBuild>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="..\include\sphere.cpp" />
     <ClCompile Include="..\include\viewer.cpp" />
     <ClCompile Include="C:\Users\User\Google 雲端硬碟\筆電桌面\DataStructure_Final\main.cpp" />
   </ItemGroup>
@@ -326,6 +327,7 @@ if %errorlevel% neq 0 goto :VCEnd</Command>
     <None Include="..\file\進度.md" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\include\sphere.h" />
     <ClInclude Include="..\include\viewer.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

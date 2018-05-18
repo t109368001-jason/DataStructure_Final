@@ -30,7 +30,7 @@ public:
 	void move(ModeDirection direction);
 	void moveAroud(GLfloat theta, GLfloat phi);
 	void screenshot(std::string fileName);
-	void play(PlayMode mode);
+	void play(PlayMode mode, pcl::PolygonMesh mesh, BOOL fill);
 
 };
 #endif // VIEWER_H
