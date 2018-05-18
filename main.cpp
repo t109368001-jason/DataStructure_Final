@@ -208,9 +208,13 @@ void Display(void)
 			viewer->Buffer.pop();
 			viewer->draw(temp, false);
 			viewer->Buffer.push(temp);
-			glutPostRedisplay();
 			viewer->count = clock();
 		}
+		else
+		{
+			viewer->draw(viewer->Buffer.back(), false);
+		}
+		glutPostRedisplay();
 	}
 	else if (viewer->mode == Stop)
 	{
