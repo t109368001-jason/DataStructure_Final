@@ -1,16 +1,36 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
-    <ClCompile Include="C:\Users\wesdx\OneDrive\文件\c\DataStructure_Final\main.cpp">
+    <ClCompile Include="C:\Users\wesdx\OneDrive\Documents\c\DataStructure_Final\main.cpp">
       <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\include\sphere.cpp">
+      <Filter>include</Filter>
+    </ClCompile>
+    <ClCompile Include="..\include\viewer.cpp">
+      <Filter>include</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <CustomBuild Include="C:\Users\wesdx\OneDrive\文件\c\DataStructure_Final\CMakeLists.txt" />
+    <CustomBuild Include="C:\Users\wesdx\OneDrive\Documents\c\DataStructure_Final\CMakeLists.txt" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Source Files">
-      <UniqueIdentifier>{AB7487A4-6BCC-3026-830D-AF6FB339D5EE}</UniqueIdentifier>
+      <UniqueIdentifier>{7BFD7875-CC2A-3567-92DB-BB22CBFD59BA}</UniqueIdentifier>
     </Filter>
+    <Filter Include="include">
+      <UniqueIdentifier>{a77f7a67-60a4-4277-aee1-129291744a51}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\include\sphere.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\viewer.h">
+      <Filter>include</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\file\進度.md" />
   </ItemGroup>
 </Project>

@@ -11,12 +11,11 @@
 #include <gl/GLU.h>
 #include <gl/glut.h>
 #include <wingdi.h>
-#include "include\viewer.h"
+#include "include/viewer.h"
 
 #define VIEWER_WIDTH 1024.0f
 #define VIEWER_HEIGHT 768.0f
 
-pcl::PointCloud<pcl::PointXYZ>::Ptr cloud(new pcl::PointCloud<pcl::PointXYZ>);
 pcl::PolygonMesh triangle;
 std::stringstream fileName;
 
@@ -28,7 +27,7 @@ void ChangeSize(int w, int h);
 void Display(void);
 void Keyboard(unsigned char key, int x, int y);
 void SpecialKeys(int key, int x, int y);
-
+void triangulation(pcl::PolygonMesh &triangle, std::string str);
 /*
 void ReadStlModel()
 {
@@ -76,13 +75,12 @@ void ReadStlModel()
 	}//while()
 }
 */
-
-int main(int argc, char* argv[])
+void triangulation(pcl::PolygonMesh &triangle, std::string str)
 {
-	//pcl::PolygonMesh triangle;
-	//viewer->Buffer.push(triangle);
+
+	pcl::PointCloud<pcl::PointXYZ>::Ptr cloud(new pcl::PointCloud<pcl::PointXYZ>);
 	pcl::PCLPointCloud2 cloud_blob;
-	pcl::io::loadPCDFile("../file/test3.pcd", cloud_blob);
+	pcl::io::loadPCDFile(&(*str.begin()), cloud_blob);
 	pcl::fromPCLPointCloud2(cloud_blob, *cloud);
 
 
@@ -127,7 +125,7 @@ int main(int argc, char* argv[])
 	pcl::GreedyProjectionTriangulation<pcl::PointNormal> gp3;
 
 	// Set the maximum distance between connected points (maximum edge length)
-	gp3.setSearchRadius(0.025);
+	gp3.setSearchRadius(50);
 
 	// Set typical values for the parameters
 	gp3.setMu(2.5);
@@ -141,7 +139,33 @@ int main(int argc, char* argv[])
 	gp3.setInputCloud(cloud_with_normals);
 	gp3.setSearchMethod(tree2);
 	gp3.reconstruct(triangle);
+}
+int main(int argc, char* argv[])
+{
+	//pcl::PolygonMesh triangle;
+	//viewer->Buffer.push(triangle);
 
+	//triangulation(triangle, "../file/75.pcd");
+	for (size_t i = 50; i <= 100; i += 5)
+	{
+		pcl::PolygonMesh triangle;
+		std::stringstream str;
+		str << "../file/";
+		str << i;
+		str << ".pcd";
+		triangulation(triangle, str.str());
+		viewer->Buffer.push(triangle);
+	}
+	for (size_t i = 95; i >= 50; i -= 5)
+	{
+		pcl::PolygonMesh triangle;
+		std::stringstream str;
+		str << "../file/";
+		str << i;
+		str << ".pcd";
+		triangulation(triangle, str.str());
+		viewer->Buffer.push(triangle);
+	}
 	//////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	glutInit(&argc, argv);
 	glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB | GLUT_DEPTH);
@@ -163,8 +187,8 @@ void Display(void)
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 	glLoadIdentity();
-	//viewer->xClick = 0;
-	//mouseMove(5, 0);
+	glColor3f(1.0, 1.0, 1.0);
+	glLineWidth(1.0);
 
 	gluLookAt(viewer->location.getY(), viewer->location.getZ(), viewer->location.getX(), viewer->location.getY() + viewer->look.getY(), viewer->location.getZ() + viewer->look.getZ(), viewer->location.getX() + viewer->look.getX(), 0.0f, 1.0f, 0.0f);
 	/*std::cout << viewer->location.radius << "\t";
@@ -175,28 +199,34 @@ void Display(void)
 	std::cout << viewer->look.phi << "\t";
 	std::cout << std::endl;
 	std::cout << std::endl;*/
-	viewer->Buffer.push(triangle);
 
 	if (viewer->mode == Start)
 	{
-		temp = viewer->Buffer.front();
-		viewer->Buffer.pop();
-		viewer->draw(temp, false);
-		viewer->Buffer.push(temp);
-		glutPostRedisplay();
+		if ((clock() - viewer->count) > (1000 / viewer->FPS))
+		{
+			temp = viewer->Buffer.front();
+			viewer->Buffer.pop();
+			viewer->draw(temp, false);
+			viewer->Buffer.push(temp);
+			glutPostRedisplay();
+		}
 	}
 	else if (viewer->mode == Stop)
 	{
 
 	}
 
-	glColor3f(1.0, 1.0, 1.0);
-	glLineWidth(1.0);
-	viewer->draw(triangle, false);
+	//glutSolidSphere(1.0, 20, 16);
+	/*glBegin(GL_TRIANGLES);
+	glVertex3f(0.0, 0.0, 0.0);
+	glVertex3f(1.0, 0.0, 0.0);
+	glVertex3f(0.0, 1.0, 0.0);
+	glEnd();*/
+	//viewer->draw(triangle, false);
 
-	glColor3f(1.0, 1.0, 1.0);
-	glPointSize(1.0);
-	viewer->draw(cloud);
+	//glColor3f(1.0, 1.0, 1.0);
+	//glPointSize(1.0);
+	//viewer->draw(cloud);
 
 	viewer->draw(10, 64, "W S A D : Move camera");
 	viewer->draw(10, 48, "Up Down Left Right : Rotate camera");
@@ -216,8 +246,6 @@ void ChangeSize(int w, int h)
 	glMatrixMode(GL_MODELVIEW);
 	glLoadIdentity();
 	gluLookAt(0.0, 0.0, 5.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0);
-
-
 }
 void Mouse(int button, int state, int x, int y)
 {

@@ -7,6 +7,9 @@ Viewer::Viewer()
 	this->look.radius = CAMERA_MOVE_SPEED;
 	this->look.theta = M_PI_2;
 	this->look.phi = M_PI;
+	this->mode = Start;
+	this->FPS = 2;
+	this->count = 0;
 }
 void Viewer::draw(pcl::PointCloud<pcl::PointXYZ>::Ptr cloud)		//Draw pointClouds
 {
@@ -23,29 +26,30 @@ void Viewer::draw(pcl::PolygonMesh &mesh, BOOL fill)		//Draw mesh
 	pcl::PointCloud<pcl::PointXYZ>::Ptr cloud(new pcl::PointCloud<pcl::PointXYZ>);
 	pcl::fromPCLPointCloud2(mesh.cloud, *cloud);
 
-	for (size_t i = 0; i < mesh.polygons.size() - 1; ++i)
+	for (size_t i = 0; i < mesh.polygons.size(); i++)
 	{
 		if (fill)
 		{
 			//有BUG的光影
 			//std::cout << triangle.cloud.data[i + 0] << "\t" << triangle.cloud.data[i + 0] << "\t" << triangle.cloud.data[i + 0] << std::endl;
-			GLfloat line1X = cloud->points[mesh.polygons[i].vertices[0]].x - cloud->points[mesh.polygons[i].vertices[1]].x;
-			GLfloat line1Y = cloud->points[mesh.polygons[i].vertices[0]].y - cloud->points[mesh.polygons[i].vertices[1]].y;
-			GLfloat line1Z = cloud->points[mesh.polygons[i].vertices[0]].z - cloud->points[mesh.polygons[i].vertices[1]].z;
-			GLfloat line2X = cloud->points[mesh.polygons[i].vertices[1]].x - cloud->points[mesh.polygons[i].vertices[2]].x;
-			GLfloat line2Y = cloud->points[mesh.polygons[i].vertices[1]].y - cloud->points[mesh.polygons[i].vertices[2]].y;
-			GLfloat line2Z = cloud->points[mesh.polygons[i].vertices[1]].z - cloud->points[mesh.polygons[i].vertices[2]].z;
-			GLfloat nX = line1Y * line2Z - line2Y * line1Z;
-			GLfloat nY = line1Z * line2X - line2Z * line1X;
-			GLfloat nZ = line1X * line2Y - line2X * line1Y;
-			GLfloat theta = acos((nX * this->location.getX() + nY * this->location.getY() + nZ * this->location.getZ()) / sqrtf(nX*nX + nY * nY + nZ * nZ) / sqrtf(this->location.getX() * this->location.getX() + this->location.getY() *this->location.getY() + this->location.getZ() * this->location.getZ()));
-			if (acos((nX * cloud->points[mesh.polygons[i].vertices[0]].x + nY * cloud->points[mesh.polygons[i].vertices[0]].y + nZ * cloud->points[mesh.polygons[i].vertices[0]].z) / sqrtf(nX * nX + nY * nY + nZ * nZ) / sqrtf(cloud->points[mesh.polygons[i].vertices[0]].x * cloud->points[mesh.polygons[i].vertices[0]].x + cloud->points[mesh.polygons[i].vertices[0]].y * cloud->points[mesh.polygons[i].vertices[0]].y + cloud->points[mesh.polygons[i].vertices[0]].z * cloud->points[mesh.polygons[i].vertices[0]].z)) < M_PI_2)
+			Eigen::Vector3f line1(cloud->points[mesh.polygons[i].vertices[0]].x - cloud->points[mesh.polygons[i].vertices[1]].x, cloud->points[mesh.polygons[i].vertices[0]].y - cloud->points[mesh.polygons[i].vertices[1]].y, cloud->points[mesh.polygons[i].vertices[0]].z - cloud->points[mesh.polygons[i].vertices[1]].z);
+			Eigen::Vector3f line2(cloud->points[mesh.polygons[i].vertices[1]].x - cloud->points[mesh.polygons[i].vertices[2]].x, cloud->points[mesh.polygons[i].vertices[1]].y - cloud->points[mesh.polygons[i].vertices[2]].y, cloud->points[mesh.polygons[i].vertices[1]].z - cloud->points[mesh.polygons[i].vertices[2]].z);
+			Eigen::Vector3f n = line1.cross(line2);
+			Eigen::Vector3f fix(cloud->points[mesh.polygons[i].vertices[0]].x, cloud->points[mesh.polygons[i].vertices[0]].y, cloud->points[mesh.polygons[i].vertices[0]].z);
+			Eigen::Vector3f light(-1,-1,-1);
+			if (acos(n.dot(fix)/n.norm()/fix.norm()) < M_PI_2)
 			{
-				theta = (M_PI - theta);
+				n *= -1;
 			}
-			glColor3f(theta / M_PI, theta / M_PI, theta / M_PI);
+			//glColor3f(theta / M_PI, theta / M_PI, theta / M_PI);
+
+			GLfloat theta = acos(n.dot(light) / n.norm() / light.norm());
 
 			glBegin(GL_TRIANGLES);
+			if (acos(n.dot(this->look.getVector()) / n.norm() / this->look.getVector().norm()) < M_PI_2)
+				glColor4f(theta / M_PI, theta / M_PI, theta / M_PI, 1.0);
+			else
+				glColor3f(0, 0, 0);
 			glVertex3f(cloud->points[mesh.polygons[i].vertices[0]].x, cloud->points[mesh.polygons[i].vertices[0]].y, cloud->points[mesh.polygons[i].vertices[0]].z);
 			glVertex3f(cloud->points[mesh.polygons[i].vertices[1]].x, cloud->points[mesh.polygons[i].vertices[1]].y, cloud->points[mesh.polygons[i].vertices[1]].z);
 			glVertex3f(cloud->points[mesh.polygons[i].vertices[2]].x, cloud->points[mesh.polygons[i].vertices[2]].y, cloud->points[mesh.polygons[i].vertices[2]].z);

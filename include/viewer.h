@@ -19,10 +19,12 @@ enum PlayMode { Start, Stop };
 class Viewer
 {
 public:
+	clock_t count;
 	Sphere location;
 	Sphere look;
 	GLfloat xClick;
 	GLfloat yClick;
+	GLfloat FPS;
 	PlayMode mode;
 	std::queue<pcl::PolygonMesh> Buffer;
 	Viewer();
