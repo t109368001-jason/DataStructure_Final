@@ -10,6 +10,9 @@
     <ClCompile Include="..\include\sphere.cpp">
       <Filter>Include</Filter>
     </ClCompile>
+    <ClCompile Include="..\include\queue.cpp">
+      <Filter>Include</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="C:\Users\User\Google 雲端硬碟\筆電桌面\DataStructure_Final\CMakeLists.txt" />

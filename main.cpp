@@ -82,7 +82,7 @@ int main(int argc, char* argv[])
 	//pcl::PolygonMesh triangle;
 	//viewer->Buffer.push(triangle);
 	pcl::PCLPointCloud2 cloud_blob;
-	pcl::io::loadPCDFile("../file/test3.pcd", cloud_blob);
+	pcl::io::loadPCDFile("../file/bunny.pcd", cloud_blob);
 	pcl::fromPCLPointCloud2(cloud_blob, *cloud);
 
 
@@ -179,7 +179,8 @@ void Display(void)
 
 	if (viewer->mode == Start)
 	{
-		temp = viewer->Buffer.pop();
+		temp = viewer->Buffer.front();
+		viewer->Buffer.pop();
 		viewer->draw(temp, false);
 		viewer->Buffer.push(temp);
 		glutPostRedisplay();

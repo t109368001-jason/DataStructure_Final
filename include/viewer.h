@@ -15,6 +15,7 @@ enum ModeDirection { Forward, Backward, Left, Right };
 
 enum PlayMode { Start, Stop };
 
+
 class Viewer
 {
 public:
