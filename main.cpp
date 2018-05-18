@@ -82,7 +82,7 @@ int main(int argc, char* argv[])
 	//pcl::PolygonMesh triangle;
 	//viewer->Buffer.push(triangle);
 	pcl::PCLPointCloud2 cloud_blob;
-	pcl::io::loadPCDFile("../file/bunny_high_helf.pcd", cloud_blob);
+	pcl::io::loadPCDFile("../file/test3.pcd", cloud_blob);
 	pcl::fromPCLPointCloud2(cloud_blob, *cloud);
 
 
@@ -127,12 +127,12 @@ int main(int argc, char* argv[])
 	pcl::GreedyProjectionTriangulation<pcl::PointNormal> gp3;
 
 	// Set the maximum distance between connected points (maximum edge length)
-	gp3.setSearchRadius(50);
+	gp3.setSearchRadius(0.025);
 
 	// Set typical values for the parameters
 	gp3.setMu(2.5);
 	gp3.setMaximumNearestNeighbors(300);
-	gp3.setMaximumSurfaceAngle(M_PI / 4); // 45 degrees
+	gp3.setMaximumSurfaceAngle(M_PI / 2); // 45 degrees
 	gp3.setMinimumAngle(M_PI / 36); // 10 degrees
 	gp3.setMaximumAngle(5 * M_PI / 6); // 120 degrees
 	gp3.setNormalConsistency(false);
