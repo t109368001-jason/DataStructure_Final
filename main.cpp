@@ -146,7 +146,7 @@ int main(int argc, char* argv[])
 	//viewer->Buffer.push(triangle);
 
 	//triangulation(triangle, "../file/75.pcd");
-	for (size_t i = 50; i <= 100; i += 5)
+	for (size_t i = 50; i <= 75; i += 5)
 	{
 		pcl::PolygonMesh triangle;
 		std::stringstream str;
@@ -156,7 +156,7 @@ int main(int argc, char* argv[])
 		triangulation(triangle, str.str());
 		viewer->Buffer.push(triangle);
 	}
-	for (size_t i = 95; i >= 50; i -= 5)
+	for (size_t i = 70; i >= 50; i -= 5)
 	{
 		pcl::PolygonMesh triangle;
 		std::stringstream str;
@@ -218,7 +218,8 @@ void Display(void)
 	}
 	else if (viewer->mode == Stop)
 	{
-
+		viewer->draw(viewer->Buffer.front(), false);
+		glutPostRedisplay();
 	}
 
 	//glutSolidSphere(1.0, 20, 16);
@@ -297,8 +298,14 @@ void Keyboard(unsigned char key, int x, int y)
 		viewer->look.theta = M_PI - viewer->location.theta;
 		viewer->look.phi = viewer->location.phi + M_PI;
 		break;
-	case '1':   viewer->mode == Start;  break;
-	case '2':   viewer->mode == Stop;   break;
+		//case '1':   viewer->mode == Start;  break;
+		//case '2':   viewer->mode == Stop;   break;
+	case 32:
+		if (viewer->mode == Start)
+			viewer->mode = Stop;
+		else
+			viewer->mode = Start;
+		break;
 
 	default:	printf("   Keyboard %c == %d\n", key, key);	break;
 
