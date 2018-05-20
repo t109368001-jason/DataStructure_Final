@@ -8,7 +8,11 @@ Viewer::Viewer()
 	this->look.theta = M_PI_2;
 	this->look.phi = M_PI;
 	this->mode = Start;
+<<<<<<< HEAD
 	this->FPS = 30;
+=======
+	this->FPS = 10;
+>>>>>>> XIAO
 	this->count = 0;
 }
 void Viewer::draw(pcl::PointCloud<pcl::PointXYZ>::Ptr cloud)		//Draw pointClouds
@@ -32,12 +36,11 @@ void Viewer::draw(pcl::PolygonMesh &mesh, BOOL fill)		//Draw mesh
 		{
 			//有BUG的光影
 			//std::cout << triangle.cloud.data[i + 0] << "\t" << triangle.cloud.data[i + 0] << "\t" << triangle.cloud.data[i + 0] << std::endl;
-			Eigen::Vector3f line1(cloud->points[mesh.polygons[i].vertices[0]].x - cloud->points[mesh.polygons[i].vertices[1]].x, cloud->points[mesh.polygons[i].vertices[0]].y - cloud->points[mesh.polygons[i].vertices[1]].y, cloud->points[mesh.polygons[i].vertices[0]].z - cloud->points[mesh.polygons[i].vertices[1]].z);
-			Eigen::Vector3f line2(cloud->points[mesh.polygons[i].vertices[1]].x - cloud->points[mesh.polygons[i].vertices[2]].x, cloud->points[mesh.polygons[i].vertices[1]].y - cloud->points[mesh.polygons[i].vertices[2]].y, cloud->points[mesh.polygons[i].vertices[1]].z - cloud->points[mesh.polygons[i].vertices[2]].z);
+			Eigen::Vector3f line1 = cloud->points[mesh.polygons[i].vertices[0]].getVector3fMap() - cloud->points[mesh.polygons[i].vertices[1]].getVector3fMap();
+			Eigen::Vector3f line2 = cloud->points[mesh.polygons[i].vertices[1]].getVector3fMap() - cloud->points[mesh.polygons[i].vertices[2]].getVector3fMap();
 			Eigen::Vector3f n = line1.cross(line2);
-			Eigen::Vector3f fix(cloud->points[mesh.polygons[i].vertices[0]].x, cloud->points[mesh.polygons[i].vertices[0]].y, cloud->points[mesh.polygons[i].vertices[0]].z);
-			Eigen::Vector3f light(-1,-1,-1);
-			if (acos(n.dot(fix)/n.norm()/fix.norm()) < M_PI_2)
+			Eigen::Vector3f light(1.0, 0.0, 0.0);
+			if (acos(n.dot(line1)/n.norm()/line1.norm()) < M_PI_2)
 			{
 				n *= -1;
 			}
@@ -45,11 +48,8 @@ void Viewer::draw(pcl::PolygonMesh &mesh, BOOL fill)		//Draw mesh
 
 			GLfloat theta = acos(n.dot(light) / n.norm() / light.norm());
 
+			glColor4f(theta / M_PI, theta / M_PI, theta / M_PI, 1.0);
 			glBegin(GL_TRIANGLES);
-			if (acos(n.dot(this->look.getVector()) / n.norm() / this->look.getVector().norm()) < M_PI_2)
-				glColor4f(theta / M_PI, theta / M_PI, theta / M_PI, 1.0);
-			else
-				glColor3f(0, 0, 0);
 			glVertex3f(cloud->points[mesh.polygons[i].vertices[0]].x, cloud->points[mesh.polygons[i].vertices[0]].y, cloud->points[mesh.polygons[i].vertices[0]].z);
 			glVertex3f(cloud->points[mesh.polygons[i].vertices[1]].x, cloud->points[mesh.polygons[i].vertices[1]].y, cloud->points[mesh.polygons[i].vertices[1]].z);
 			glVertex3f(cloud->points[mesh.polygons[i].vertices[2]].x, cloud->points[mesh.polygons[i].vertices[2]].y, cloud->points[mesh.polygons[i].vertices[2]].z);
@@ -58,9 +58,11 @@ void Viewer::draw(pcl::PolygonMesh &mesh, BOOL fill)		//Draw mesh
 		else
 		{
 			glBegin(GL_LINES);
-			glVertex3f(cloud->points[mesh.polygons[i].vertices[0]].x, cloud->points[mesh.polygons[i].vertices[0]].y, cloud->points[mesh.polygons[i].vertices[0]].z);
+			for (size_t j = 0; j < mesh.polygons[i].vertices.size(); j++)
+				glVertex3f(cloud->points[mesh.polygons[i].vertices[j]].x, cloud->points[mesh.polygons[i].vertices[j]].y, cloud->points[mesh.polygons[i].vertices[j]].z);
+			/*glVertex3f(cloud->points[mesh.polygons[i].vertices[0]].x, cloud->points[mesh.polygons[i].vertices[0]].y, cloud->points[mesh.polygons[i].vertices[0]].z);
 			glVertex3f(cloud->points[mesh.polygons[i].vertices[1]].x, cloud->points[mesh.polygons[i].vertices[1]].y, cloud->points[mesh.polygons[i].vertices[1]].z);
-			glVertex3f(cloud->points[mesh.polygons[i].vertices[2]].x, cloud->points[mesh.polygons[i].vertices[2]].y, cloud->points[mesh.polygons[i].vertices[2]].z);
+			glVertex3f(cloud->points[mesh.polygons[i].vertices[2]].x, cloud->points[mesh.polygons[i].vertices[2]].y, cloud->points[mesh.polygons[i].vertices[2]].z);*/
 			glVertex3f(cloud->points[mesh.polygons[i].vertices[0]].x, cloud->points[mesh.polygons[i].vertices[0]].y, cloud->points[mesh.polygons[i].vertices[0]].z);
 			glEnd();
 		}
