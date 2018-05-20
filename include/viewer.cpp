@@ -8,7 +8,7 @@ Viewer::Viewer()
 	this->look.theta = M_PI_2;
 	this->look.phi = M_PI;
 	this->mode = Start;
-	this->FPS = 10;
+	this->FPS = 20;
 	this->count = 0;
 }
 void Viewer::draw(pcl::PointCloud<pcl::PointXYZ>::Ptr cloud)		//Draw pointClouds
