@@ -1,4 +1,14 @@
 #include "viewer.h"
+
+
+struct triangle
+{
+	float distanse;
+	Eigen::Vector3f normal;
+	std::vector<uint32_t> vertices;
+};
+bool func(triangle &a, triangle &b) { return a.distanse > b.distanse; }
+
 Viewer::Viewer()
 {
 	this->location.radius = 1.0;
@@ -9,9 +19,13 @@ Viewer::Viewer()
 	this->look.phi = M_PI;
 	this->mode = Start;
 <<<<<<< HEAD
+<<<<<<< HEAD
 	this->FPS = 30;
 =======
 	this->FPS = 10;
+>>>>>>> XIAO
+=======
+	this->FPS = 20;
 >>>>>>> XIAO
 	this->count = 0;
 }
@@ -29,42 +43,129 @@ void Viewer::draw(pcl::PolygonMesh &mesh, BOOL fill)		//Draw mesh
 {
 	pcl::PointCloud<pcl::PointXYZ>::Ptr cloud(new pcl::PointCloud<pcl::PointXYZ>);
 	pcl::fromPCLPointCloud2(mesh.cloud, *cloud);
-
-	for (size_t i = 0; i < mesh.polygons.size(); i++)
+	if (fill)
 	{
-		if (fill)
+		std::vector<triangle> sortVector;
+		for (size_t i = 0; i < mesh.polygons.size(); i++)
 		{
-			//有BUG的光影
+			triangle temp;
 			//std::cout << triangle.cloud.data[i + 0] << "\t" << triangle.cloud.data[i + 0] << "\t" << triangle.cloud.data[i + 0] << std::endl;
 			Eigen::Vector3f line1 = cloud->points[mesh.polygons[i].vertices[0]].getVector3fMap() - cloud->points[mesh.polygons[i].vertices[1]].getVector3fMap();
 			Eigen::Vector3f line2 = cloud->points[mesh.polygons[i].vertices[1]].getVector3fMap() - cloud->points[mesh.polygons[i].vertices[2]].getVector3fMap();
 			Eigen::Vector3f n = line1.cross(line2);
-			Eigen::Vector3f light(1.0, 0.0, 0.0);
-			if (acos(n.dot(line1)/n.norm()/line1.norm()) < M_PI_2)
+			Eigen::Vector3f loc(this->location.getY(), this->location.getZ(), this->location.getX());
+			if (acos(n.dot(cloud->points[mesh.polygons[i].vertices[0]].getVector3fMap()) / n.norm() / cloud->points[mesh.polygons[i].vertices[0]].getVector3fMap().norm()) >= M_PI_2)
 			{
 				n *= -1;
 			}
-			//glColor3f(theta / M_PI, theta / M_PI, theta / M_PI);
-
-			GLfloat theta = acos(n.dot(light) / n.norm() / light.norm());
-
-			glColor4f(theta / M_PI, theta / M_PI, theta / M_PI, 1.0);
-			glBegin(GL_TRIANGLES);
-			glVertex3f(cloud->points[mesh.polygons[i].vertices[0]].x, cloud->points[mesh.polygons[i].vertices[0]].y, cloud->points[mesh.polygons[i].vertices[0]].z);
-			glVertex3f(cloud->points[mesh.polygons[i].vertices[1]].x, cloud->points[mesh.polygons[i].vertices[1]].y, cloud->points[mesh.polygons[i].vertices[1]].z);
-			glVertex3f(cloud->points[mesh.polygons[i].vertices[2]].x, cloud->points[mesh.polygons[i].vertices[2]].y, cloud->points[mesh.polygons[i].vertices[2]].z);
-			glEnd();
+			if (acos(n.dot(loc) / n.norm() / loc.norm()) <= M_PI_2)
+			{
+				pcl::CentroidPoint<pcl::PointXYZ> centroid;
+				pcl::PointXYZ cent;
+				for (size_t j = 0; j < mesh.polygons[i].vertices.size(); j++)
+				{
+					centroid.add(cloud->points[mesh.polygons[i].vertices[j]]);
+					temp.vertices.push_back(mesh.polygons[i].vertices[j]);
+				}
+				temp.normal = n;
+				centroid.get(cent);
+				temp.distanse = (cent.getVector3fMap() -this->location.getVector()).norm();
+				sortVector.push_back(temp);
+			}
 		}
-		else
+		std::sort(sortVector.begin(), sortVector.end(), func);
+		for (size_t i = 0; i < sortVector.size(); i++)
+		{
+			triangle temp;
+			Eigen::Vector3f light(-1.0, 0.0, 0.0);
+			GLfloat theta;
+			temp = sortVector[i];
+			theta = acos(temp.normal.dot(light) / temp.normal.norm() / light.norm());
+			glColor3f(theta / M_PI, theta / M_PI, theta / M_PI);
+			if (temp.vertices.size() == 3)
+			{
+				glBegin(GL_TRIANGLES);
+				for (size_t j = 0; j < temp.vertices.size(); j++)
+					glVertex3f(cloud->points[temp.vertices[j]].x, cloud->points[temp.vertices[j]].y, cloud->points[temp.vertices[j]].z);
+				glEnd();
+			}
+			else if (temp.vertices.size() == 4)
+			{
+				glBegin(GL_QUADS);
+				for (size_t j = 0; j < temp.vertices.size(); j++)
+					glVertex3f(cloud->points[temp.vertices[j]].x, cloud->points[temp.vertices[j]].y, cloud->points[temp.vertices[j]].z);
+				glEnd();
+			}
+			else
+			{
+				glBegin(GL_LINES);
+				for (size_t j = 0; j < temp.vertices.size(); j++)
+					glVertex3f(cloud->points[temp.vertices[j]].x, cloud->points[temp.vertices[j]].y, cloud->points[temp.vertices[j]].z);
+				glVertex3f(cloud->points[temp.vertices[0]].x, cloud->points[temp.vertices[0]].y, cloud->points[temp.vertices[0]].z);
+				glEnd();
+			}
+		}
+		/*for (size_t i = 0; i < mesh.polygons.size(); i++)
+		{
+			//std::cout << triangle.cloud.data[i + 0] << "\t" << triangle.cloud.data[i + 0] << "\t" << triangle.cloud.data[i + 0] << std::endl;
+			Eigen::Vector3f line1 = cloud->points[mesh.polygons[i].vertices[0]].getVector3fMap() - cloud->points[mesh.polygons[i].vertices[1]].getVector3fMap();
+			Eigen::Vector3f line2 = cloud->points[mesh.polygons[i].vertices[1]].getVector3fMap() - cloud->points[mesh.polygons[i].vertices[2]].getVector3fMap();
+			Eigen::Vector3f n = line1.cross(line2);
+			Eigen::Vector3f light(-1.0, 0.0, 0.0);
+			Eigen::Vector3f loc(this->location.getY(), this->location.getZ(), this->location.getX());
+			GLfloat theta;
+			if (acos(n.dot(cloud->points[mesh.polygons[i].vertices[0]].getVector3fMap()) / n.norm() / cloud->points[mesh.polygons[i].vertices[0]].getVector3fMap().norm()) >= M_PI_2)
+			{
+				n *= -1;
+			}
+			if (acos(n.dot(loc) / n.norm() / loc.norm()) <= M_PI_2)
+			{
+				theta = acos(n.dot(light) / n.norm() / light.norm());
+				if (i == 2)
+				{
+					std::cout << "point 0 = " << cloud->points[mesh.polygons[i].vertices[0]].getVector3fMap() << std::endl;
+					std::cout << "n = " << n << std::endl;
+					std::cout << "location = " << this->location.getVector() << std::endl;
+					std::cout << "theta = " << theta << std::endl;
+				}
+				glColor3f(theta / M_PI, theta / M_PI, theta / M_PI);
+				if (mesh.polygons[i].vertices.size() == 3)
+				{
+					glBegin(GL_TRIANGLES);
+					for (size_t j = 0; j < mesh.polygons[i].vertices.size(); j++)
+						glVertex3f(cloud->points[mesh.polygons[i].vertices[j]].x, cloud->points[mesh.polygons[i].vertices[j]].y, cloud->points[mesh.polygons[i].vertices[j]].z);
+					glEnd();
+				}
+				else if (mesh.polygons[i].vertices.size() == 4)
+				{
+					glBegin(GL_QUADS);
+					for (size_t j = 0; j < mesh.polygons[i].vertices.size(); j++)
+						glVertex3f(cloud->points[mesh.polygons[i].vertices[j]].x, cloud->points[mesh.polygons[i].vertices[j]].y, cloud->points[mesh.polygons[i].vertices[j]].z);
+					glEnd();
+				}
+				else
+				{
+					glBegin(GL_LINES);
+					for (size_t j = 0; j < mesh.polygons[i].vertices.size(); j++)
+						glVertex3f(cloud->points[mesh.polygons[i].vertices[j]].x, cloud->points[mesh.polygons[i].vertices[j]].y, cloud->points[mesh.polygons[i].vertices[j]].z);
+					glVertex3f(cloud->points[mesh.polygons[i].vertices[0]].x, cloud->points[mesh.polygons[i].vertices[0]].y, cloud->points[mesh.polygons[i].vertices[0]].z);
+					glEnd();
+				}
+			}
+		}*/
+	}
+	else
+	{
+		for (size_t i = 0; i < mesh.polygons.size(); i++)
 		{
 			glBegin(GL_LINES);
 			for (size_t j = 0; j < mesh.polygons[i].vertices.size(); j++)
 				glVertex3f(cloud->points[mesh.polygons[i].vertices[j]].x, cloud->points[mesh.polygons[i].vertices[j]].y, cloud->points[mesh.polygons[i].vertices[j]].z);
+			glVertex3f(cloud->points[mesh.polygons[i].vertices[0]].x, cloud->points[mesh.polygons[i].vertices[0]].y, cloud->points[mesh.polygons[i].vertices[0]].z);
+			glEnd();
 			/*glVertex3f(cloud->points[mesh.polygons[i].vertices[0]].x, cloud->points[mesh.polygons[i].vertices[0]].y, cloud->points[mesh.polygons[i].vertices[0]].z);
 			glVertex3f(cloud->points[mesh.polygons[i].vertices[1]].x, cloud->points[mesh.polygons[i].vertices[1]].y, cloud->points[mesh.polygons[i].vertices[1]].z);
 			glVertex3f(cloud->points[mesh.polygons[i].vertices[2]].x, cloud->points[mesh.polygons[i].vertices[2]].y, cloud->points[mesh.polygons[i].vertices[2]].z);*/
-			glVertex3f(cloud->points[mesh.polygons[i].vertices[0]].x, cloud->points[mesh.polygons[i].vertices[0]].y, cloud->points[mesh.polygons[i].vertices[0]].z);
-			glEnd();
 		}
 	}
 }
