@@ -5,6 +5,7 @@
 #include <pcl/kdtree/kdtree_flann.h>
 #include <pcl/features/normal_3d.h>
 #include <pcl/surface/gp3.h>
+#include <pcl/surface/poisson.h>
 #include <math.h>
 #include <vector>
 #include <gl/GL.h>
@@ -29,6 +30,8 @@ void Display(void);
 void Keyboard(unsigned char key, int x, int y);
 void SpecialKeys(int key, int x, int y);
 void triangulation(pcl::PolygonMesh &triangle, std::string str);
+void poission_surface(pcl::PolygonMesh &poission, std::string str);
+//void poission(const pcl::PCLPointCloud2::ConstPtr &input, pcl::PolygonMesh &output,	int depth, int solver_divide, int iso_divide, float point_weight)
 /*
 void ReadStlModel()
 {
@@ -117,7 +120,6 @@ void triangulation(pcl::PolygonMesh &triangle, std::string str)
 	pcl::PointCloud<pcl::PointNormal>::Ptr cloud_with_normals(new pcl::PointCloud<pcl::PointNormal>);
 	pcl::concatenateFields(*cloud, *normals, *cloud_with_normals);
 	//* cloud_with_normals = cloud + normals
-
 	// Create search tree*
 	pcl::search::KdTree<pcl::PointNormal>::Ptr tree2(new pcl::search::KdTree<pcl::PointNormal>);
 	tree2->setInputCloud(cloud_with_normals);
@@ -141,6 +143,61 @@ void triangulation(pcl::PolygonMesh &triangle, std::string str)
 	gp3.setSearchMethod(tree2);
 	gp3.reconstruct(triangle);
 }
+//void poission(const pcl::PCLPointCloud2::ConstPtr &input, pcl::PolygonMesh &output,int depth, int solver_divide, int iso_divide, float point_weight)
+void poission_surface(pcl::PolygonMesh &poission, std::string str)
+{
+
+	pcl::PointCloud<pcl::PointXYZ>::Ptr cloud(new pcl::PointCloud<pcl::PointXYZ>);
+	pcl::PCLPointCloud2 cloud_blob;
+	pcl::io::loadPCDFile(&(*str.begin()), cloud_blob);
+	pcl::fromPCLPointCloud2(cloud_blob, *cloud);
+
+
+	pcl::CentroidPoint<pcl::PointXYZ> centroid;
+	pcl::PointXYZ cent;
+	for (size_t i = 0; i < cloud->points.size(); i++)
+	{
+		centroid.add(cloud->points[i]);
+	}
+	centroid.get(cent);
+	//std::cout << cent << std::endl;
+	for (size_t i = 0; i < cloud->points.size(); i++)
+	{
+		cloud->points[i].x -= cent.x;
+		cloud->points[i].y -= cent.y;
+		cloud->points[i].z -= cent.z;
+	}
+	//viewer->Buffer.push(triangle);
+	//* the data should be available in cloud
+
+	// Normal estimation*
+	pcl::NormalEstimation<pcl::PointXYZ, pcl::Normal> n;
+	pcl::PointCloud<pcl::Normal>::Ptr normals(new pcl::PointCloud<pcl::Normal>);
+	pcl::search::KdTree<pcl::PointXYZ>::Ptr tree(new pcl::search::KdTree<pcl::PointXYZ>);
+	tree->setInputCloud(cloud);
+	n.setInputCloud(cloud);
+	n.setSearchMethod(tree);
+	n.setKSearch(30);
+	n.compute(*normals);
+	//* normals should not contain the point normals + surface curvatures
+
+	// Concatenate the XYZ and normal fields*
+	pcl::PointCloud<pcl::PointNormal>::Ptr cloud_with_normals(new pcl::PointCloud<pcl::PointNormal>);
+	pcl::concatenateFields(*cloud, *normals, *cloud_with_normals);
+	//* cloud_with_normals = cloud + normals
+	// Create search tree*
+	pcl::search::KdTree<pcl::PointNormal>::Ptr tree2(new pcl::search::KdTree<pcl::PointNormal>);
+	tree2->setInputCloud(cloud_with_normals);
+
+	pcl::Poisson<pcl::PointNormal> poisson;
+	poisson.setDepth(8);
+	poisson.setSolverDivide(8);
+	poisson.setIsoDivide(8);
+	poisson.setPointWeight(4.0f);
+	poisson.setInputCloud(cloud_with_normals);
+
+	poisson.reconstruct(poission);
+}
 void t1()
 {
 	while (1)
@@ -158,7 +215,18 @@ int main(int argc, char* argv[])
 	//viewer->Buffer.push(triangle);
 
 	//triangulation(triangle, "../file/75.pcd");
-	for (size_t i = 50; i < 100; i += 5)
+	for (size_t i = 50; i < 55; i += 5)
+	{
+		pcl::PolygonMesh triangle;
+		std::stringstream str;
+		str << "../file/";
+		str << i;
+		str << ".pcd";
+		//triangulation(triangle, str.str());
+		poission_surface(triangle, str.str());
+		viewer->Buffer.push(triangle);
+	}
+	/*for (size_t i = 100; i > 50; i -= 5)
 	{
 		pcl::PolygonMesh triangle;
 		std::stringstream str;
@@ -167,17 +235,7 @@ int main(int argc, char* argv[])
 		str << ".pcd";
 		triangulation(triangle, str.str());
 		viewer->Buffer.push(triangle);
-	}
-	for (size_t i = 100; i > 50; i -= 5)
-	{
-		pcl::PolygonMesh triangle;
-		std::stringstream str;
-		str << "../file/";
-		str << i;
-		str << ".pcd";
-		triangulation(triangle, str.str());
-		viewer->Buffer.push(triangle);
-	}
+	}*/
 	//////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	glutInit(&argc, argv);
 	glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB | GLUT_DEPTH);
@@ -210,13 +268,13 @@ void Display(void)
 		{
 			temp = viewer->Buffer.front();
 			viewer->Buffer.pop();
-			viewer->draw(temp, false);
+			viewer->draw(temp, true);
 			viewer->Buffer.push(temp);
 			viewer->count = clock();
 		}
 		else
 		{
-			viewer->draw(viewer->Buffer.back(), false);
+			viewer->draw(viewer->Buffer.back(), true);
 		}
 		glutPostRedisplay();
 	}
