@@ -215,11 +215,8 @@ int main(int argc, char* argv[])
 	//viewer->Buffer.push(triangle);
 
 	//triangulation(triangle, "../file/75.pcd");
-<<<<<<< HEAD
+
 	for (size_t i = 50; i < 55; i += 5)
-=======
-	for (size_t i = 50; i <= 75; i += 5)
->>>>>>> master
 	{
 		pcl::PolygonMesh triangle;
 		std::stringstream str;
@@ -230,11 +227,8 @@ int main(int argc, char* argv[])
 		poission_surface(triangle, str.str());
 		viewer->Buffer.push(triangle);
 	}
-<<<<<<< HEAD
-	/*for (size_t i = 100; i > 50; i -= 5)
-=======
+/*
 	for (size_t i = 70; i >= 50; i -= 5)
->>>>>>> master
 	{
 		pcl::PolygonMesh triangle;
 		std::stringstream str;
@@ -279,19 +273,11 @@ void Display(void)
 			viewer->draw(temp, true);
 			viewer->Buffer.push(temp);
 			viewer->count = clock();
-<<<<<<< HEAD
-		}
-		else
-		{
-			viewer->draw(viewer->Buffer.back(), true);
-		}
-=======
 		}
 		else
 		{
 			viewer->draw(viewer->Buffer.back(), false);
 		}
->>>>>>> master
 		glutPostRedisplay();
 	}
 	else if (viewer->mode == Stop)
