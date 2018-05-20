@@ -236,8 +236,8 @@ int main(int argc, char* argv[])
 		std::stringstream infile;
 		infile << "../file/";
 		infile << i;
-		//triangulation(triangle, infile.str());
-		poission_surface(triangle, infile.str());
+		triangulation(triangle, infile.str());
+		//poission_surface(triangle, infile.str());
 		viewer->Buffer.push(triangle);
 	}
 	for (size_t i = 100; i > 50; i -= 5)
@@ -246,8 +246,8 @@ int main(int argc, char* argv[])
 		std::stringstream infile;
 		infile << "../file/";
 		infile << i;
-		//triangulation(triangle, infile.str());
-		poission_surface(triangle, infile.str());
+		triangulation(triangle, infile.str());
+		//poission_surface(triangle, infile.str());
 		viewer->Buffer.push(triangle);
 	}
 	//////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -282,19 +282,19 @@ void Display(void)
 		{
 			temp = viewer->Buffer.front();
 			viewer->Buffer.pop();
-			viewer->draw(temp, false);
+			viewer->draw(temp, true);
 			viewer->Buffer.push(temp);
 			viewer->count = clock();
 		}
 		else
 		{
-			viewer->draw(viewer->Buffer.back(), false);
+			viewer->draw(viewer->Buffer.back(), true);
 		}
 		glutPostRedisplay();
 	}
 	else if (viewer->mode == Stop)
 	{
-		viewer->draw(viewer->Buffer.front(), false);
+		viewer->draw(viewer->Buffer.front(), true);
 		glutPostRedisplay(); 
 	}
 	viewer->draw(10, 64, "W S A D : Move camera");
