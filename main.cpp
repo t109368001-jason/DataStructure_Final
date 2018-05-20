@@ -215,7 +215,11 @@ int main(int argc, char* argv[])
 	//viewer->Buffer.push(triangle);
 
 	//triangulation(triangle, "../file/75.pcd");
+<<<<<<< HEAD
 	for (size_t i = 50; i < 55; i += 5)
+=======
+	for (size_t i = 50; i <= 75; i += 5)
+>>>>>>> master
 	{
 		pcl::PolygonMesh triangle;
 		std::stringstream str;
@@ -226,7 +230,11 @@ int main(int argc, char* argv[])
 		poission_surface(triangle, str.str());
 		viewer->Buffer.push(triangle);
 	}
+<<<<<<< HEAD
 	/*for (size_t i = 100; i > 50; i -= 5)
+=======
+	for (size_t i = 70; i >= 50; i -= 5)
+>>>>>>> master
 	{
 		pcl::PolygonMesh triangle;
 		std::stringstream str;
@@ -271,16 +279,25 @@ void Display(void)
 			viewer->draw(temp, true);
 			viewer->Buffer.push(temp);
 			viewer->count = clock();
+<<<<<<< HEAD
 		}
 		else
 		{
 			viewer->draw(viewer->Buffer.back(), true);
 		}
+=======
+		}
+		else
+		{
+			viewer->draw(viewer->Buffer.back(), false);
+		}
+>>>>>>> master
 		glutPostRedisplay();
 	}
 	else if (viewer->mode == Stop)
 	{
-
+		viewer->draw(viewer->Buffer.front(), false);
+		glutPostRedisplay();
 	}
 	viewer->draw(10, 64, "W S A D : Move camera");
 	viewer->draw(10, 48, "Up Down Left Right : Rotate camera");
@@ -346,8 +363,14 @@ void Keyboard(unsigned char key, int x, int y)
 		viewer->look.theta = M_PI - viewer->location.theta;
 		viewer->look.phi = viewer->location.phi + M_PI;
 		break;
-	case '1':   viewer->mode == Start;  break;
-	case '2':   viewer->mode == Stop;   break;
+		//case '1':   viewer->mode == Start;  break;
+		//case '2':   viewer->mode == Stop;   break;
+	case 32:
+		if (viewer->mode == Start)
+			viewer->mode = Stop;
+		else
+			viewer->mode = Start;
+		break;
 
 	default:	printf("   Keyboard %c == %d\n", key, key);	break;
 
