@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
-    <CustomBuild Include="C:\Users\XIAO\OneDrive\文件\c\DataStructure_Final\CMakeLists.txt" />
+    <CustomBuild Include="C:\Users\wesdx\OneDrive\Documents\c\DataStructure_Final\CMakeLists.txt" />
   </ItemGroup>
   <ItemGroup>
   </ItemGroup>
