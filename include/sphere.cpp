@@ -6,28 +6,34 @@ Sphere::Sphere()
 	this->theta = 0;
 	this->phi = 0;
 }
+
 Sphere::Sphere(GLfloat radius, GLfloat theta, GLfloat phi)
 {
 	this->radius = radius;
 	this->theta = theta;
 	this->phi = phi;
 }
+
 GLfloat Sphere::getX()
 {
 	return this->radius*sin(this->theta)*cos(this->phi);
 }
+
 GLfloat Sphere::getY()
 {
 	return this->radius*sin(this->theta)*sin(this->phi);
 }
+
 GLfloat Sphere::getZ()
 {
 	return this->radius*cos(this->theta);
 }
+
 Eigen::Vector3f Sphere::getVector()
 {
 	return Eigen::Vector3f(this->getX(), this->getY(), this->getZ());
 }
+
 void Sphere::set(Eigen::Vector3f v)
 {
 	this->radius = v.norm();
@@ -36,6 +42,7 @@ void Sphere::set(Eigen::Vector3f v)
 	if (v[0] < 0.0)
 		this->phi += M_PI;
 }
+
 BOOL Sphere::checkTheta(GLfloat deltaTheta)
 {
 	if ((this->theta + deltaTheta) < 0.0)
