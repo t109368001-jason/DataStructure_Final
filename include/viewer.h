@@ -5,6 +5,7 @@
 #include <pcl/surface/gp3.h>
 #include <pcl/common/centroid.h>
 #include <gl/glut.h>
+#include <time.h>
 #include "sphere.h"
 
 #define CAMERA_MOVE_SPEED		0.05f
@@ -13,8 +14,7 @@
 
 enum ModeDirection { Forward, Backward, Left, Right };
 
-enum PlayMode { Start, Stop };
-
+enum PlayMode { Play, Pause };
 
 class Viewer
 {
@@ -26,15 +26,16 @@ public:
 	GLfloat yClick;
 	GLfloat FPS;
 	PlayMode mode;
+	BOOL fill;
 	std::queue<pcl::PolygonMesh> Buffer;
 	Viewer();
-	void draw(pcl::PointCloud<pcl::PointXYZ>::Ptr cloud);		// Draw point cloud
+	void Viewer::draw(pcl::PCLPointCloud2 cloud2);		// Draw point cloud
 	void draw(pcl::PolygonMesh &mesh, BOOL fill);							// Draw mesh
 	void draw(GLfloat x, GLfloat y, std::string s);				// Draw caption
 	void rotation(GLfloat theta, GLfloat phi);
 	void move(ModeDirection direction);
 	void moveAroud(GLfloat theta, GLfloat phi);
+	void screenshot();
 	void screenshot(std::string fileName);
-
 };
 #endif // VIEWER_H

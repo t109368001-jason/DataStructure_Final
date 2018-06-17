@@ -1,13 +1,13 @@
 #include "viewer.h"
 
-
 struct triangle
 {
 	float distanse;
 	Eigen::Vector3f normal;
 	std::vector<uint32_t> vertices;
 };
-bool func(triangle &a, triangle &b) { return a.distanse > b.distanse; }
+
+bool compFunc(triangle &a, triangle &b) { return a.distanse > b.distanse; }
 
 Viewer::Viewer()
 {
@@ -17,40 +17,45 @@ Viewer::Viewer()
 	this->look.radius = CAMERA_MOVE_SPEED;
 	this->look.theta = M_PI_2;
 	this->look.phi = M_PI;
-	this->mode = Start;
-	this->FPS = 20;
+	this->mode = Play;
+	this->FPS = 30;
 	this->count = 0;
+	this->fill = false;
 }
-void Viewer::draw(pcl::PointCloud<pcl::PointXYZ>::Ptr cloud)		//Draw pointClouds
+
+void Viewer::draw(pcl::PCLPointCloud2 cloud2)		//Draw pointClouds
 {
+	pcl::PointCloud<pcl::PointXYZ>::Ptr cloud(new pcl::PointCloud<pcl::PointXYZ>);
+	pcl::fromPCLPointCloud2(cloud2, *cloud);
 	for (size_t i = 0; i < cloud->points.size(); ++i)
 	{
-
 		glBegin(GL_POINTS);
 		glVertex3f(cloud->points[i].x, cloud->points[i].y, cloud->points[i].z);
 		glEnd();
 	}
 }
+
 void Viewer::draw(pcl::PolygonMesh &mesh, BOOL fill)		//Draw mesh
 {
 	pcl::PointCloud<pcl::PointXYZ>::Ptr cloud(new pcl::PointCloud<pcl::PointXYZ>);
 	pcl::fromPCLPointCloud2(mesh.cloud, *cloud);
-	if (fill)
+	if (fill && (mesh.polygons.size() > 2))
 	{
-		std::vector<triangle> sortVector;
+		/*std::vector<triangle> sortVector;
 		for (size_t i = 0; i < mesh.polygons.size(); i++)
 		{
 			triangle temp;
-			//std::cout << triangle.cloud.data[i + 0] << "\t" << triangle.cloud.data[i + 0] << "\t" << triangle.cloud.data[i + 0] << std::endl;
 			Eigen::Vector3f line1 = cloud->points[mesh.polygons[i].vertices[0]].getVector3fMap() - cloud->points[mesh.polygons[i].vertices[1]].getVector3fMap();
 			Eigen::Vector3f line2 = cloud->points[mesh.polygons[i].vertices[1]].getVector3fMap() - cloud->points[mesh.polygons[i].vertices[2]].getVector3fMap();
 			Eigen::Vector3f n = line1.cross(line2);
 			Eigen::Vector3f loc(this->location.getY(), this->location.getZ(), this->location.getX());
-			if (acos(n.dot(cloud->points[mesh.polygons[i].vertices[0]].getVector3fMap()) / n.norm() / cloud->points[mesh.polygons[i].vertices[0]].getVector3fMap().norm()) >= M_PI_2)
+
+			loc -= cloud->points[mesh.polygons[i].vertices[0]].getVector3fMap();
+			if (acos(n.dot(cloud->points[mesh.polygons[i].vertices[0]].getVector3fMap()) / n.norm() / cloud->points[mesh.polygons[i].vertices[0]].getVector3fMap().norm()) > M_PI_2)
 			{
 				n *= -1;
 			}
-			if (acos(n.dot(loc) / n.norm() / loc.norm()) <= M_PI_2)
+			if (acos(n.dot(loc) / n.norm() / loc.norm()) < M_PI_2)
 			{
 				pcl::CentroidPoint<pcl::PointXYZ> centroid;
 				pcl::PointXYZ cent;
@@ -61,16 +66,17 @@ void Viewer::draw(pcl::PolygonMesh &mesh, BOOL fill)		//Draw mesh
 				}
 				temp.normal = n;
 				centroid.get(cent);
-				temp.distanse = (cent.getVector3fMap() -this->location.getVector()).norm();
+				temp.distanse = (cent.getVector3fMap() - this->location.getVector()).norm();
 				sortVector.push_back(temp);
 			}
 		}
-		std::sort(sortVector.begin(), sortVector.end(), func);
+		std::sort(sortVector.begin(), sortVector.end(), compFunc);
 		for (size_t i = 0; i < sortVector.size(); i++)
 		{
 			triangle temp;
 			Eigen::Vector3f light(-1.0, 0.0, 0.0);
 			GLfloat theta;
+
 			temp = sortVector[i];
 			theta = acos(temp.normal.dot(light) / temp.normal.norm() / light.norm());
 			glColor3f(theta / M_PI, theta / M_PI, theta / M_PI);
@@ -96,16 +102,17 @@ void Viewer::draw(pcl::PolygonMesh &mesh, BOOL fill)		//Draw mesh
 				glVertex3f(cloud->points[temp.vertices[0]].x, cloud->points[temp.vertices[0]].y, cloud->points[temp.vertices[0]].z);
 				glEnd();
 			}
-		}
-		/*for (size_t i = 0; i < mesh.polygons.size(); i++)
+		}*/
+		for (size_t i = 0; i < mesh.polygons.size(); i++)
 		{
-			//std::cout << triangle.cloud.data[i + 0] << "\t" << triangle.cloud.data[i + 0] << "\t" << triangle.cloud.data[i + 0] << std::endl;
 			Eigen::Vector3f line1 = cloud->points[mesh.polygons[i].vertices[0]].getVector3fMap() - cloud->points[mesh.polygons[i].vertices[1]].getVector3fMap();
 			Eigen::Vector3f line2 = cloud->points[mesh.polygons[i].vertices[1]].getVector3fMap() - cloud->points[mesh.polygons[i].vertices[2]].getVector3fMap();
 			Eigen::Vector3f n = line1.cross(line2);
 			Eigen::Vector3f light(-1.0, 0.0, 0.0);
 			Eigen::Vector3f loc(this->location.getY(), this->location.getZ(), this->location.getX());
 			GLfloat theta;
+
+			loc -= cloud->points[mesh.polygons[i].vertices[0]].getVector3fMap();
 			if (acos(n.dot(cloud->points[mesh.polygons[i].vertices[0]].getVector3fMap()) / n.norm() / cloud->points[mesh.polygons[i].vertices[0]].getVector3fMap().norm()) >= M_PI_2)
 			{
 				n *= -1;
@@ -113,13 +120,6 @@ void Viewer::draw(pcl::PolygonMesh &mesh, BOOL fill)		//Draw mesh
 			if (acos(n.dot(loc) / n.norm() / loc.norm()) <= M_PI_2)
 			{
 				theta = acos(n.dot(light) / n.norm() / light.norm());
-				if (i == 2)
-				{
-					std::cout << "point 0 = " << cloud->points[mesh.polygons[i].vertices[0]].getVector3fMap() << std::endl;
-					std::cout << "n = " << n << std::endl;
-					std::cout << "location = " << this->location.getVector() << std::endl;
-					std::cout << "theta = " << theta << std::endl;
-				}
 				glColor3f(theta / M_PI, theta / M_PI, theta / M_PI);
 				if (mesh.polygons[i].vertices.size() == 3)
 				{
@@ -144,9 +144,9 @@ void Viewer::draw(pcl::PolygonMesh &mesh, BOOL fill)		//Draw mesh
 					glEnd();
 				}
 			}
-		}*/
+		}
 	}
-	else
+	else if((!fill) && (mesh.polygons.size() > 1))
 	{
 		for (size_t i = 0; i < mesh.polygons.size(); i++)
 		{
@@ -155,12 +155,14 @@ void Viewer::draw(pcl::PolygonMesh &mesh, BOOL fill)		//Draw mesh
 				glVertex3f(cloud->points[mesh.polygons[i].vertices[j]].x, cloud->points[mesh.polygons[i].vertices[j]].y, cloud->points[mesh.polygons[i].vertices[j]].z);
 			glVertex3f(cloud->points[mesh.polygons[i].vertices[0]].x, cloud->points[mesh.polygons[i].vertices[0]].y, cloud->points[mesh.polygons[i].vertices[0]].z);
 			glEnd();
-			/*glVertex3f(cloud->points[mesh.polygons[i].vertices[0]].x, cloud->points[mesh.polygons[i].vertices[0]].y, cloud->points[mesh.polygons[i].vertices[0]].z);
-			glVertex3f(cloud->points[mesh.polygons[i].vertices[1]].x, cloud->points[mesh.polygons[i].vertices[1]].y, cloud->points[mesh.polygons[i].vertices[1]].z);
-			glVertex3f(cloud->points[mesh.polygons[i].vertices[2]].x, cloud->points[mesh.polygons[i].vertices[2]].y, cloud->points[mesh.polygons[i].vertices[2]].z);*/
 		}
 	}
+	else if(mesh.polygons.size() > 0)
+	{
+		this->draw(mesh.cloud);
+	}
 }
+
 void Viewer::draw(GLfloat x, GLfloat y, std::string s)		//Draw text
 {
 	glPushMatrix();
@@ -170,15 +172,13 @@ void Viewer::draw(GLfloat x, GLfloat y, std::string s)		//Draw text
 	gluOrtho2D(0.0, glutGet(GLUT_WINDOW_WIDTH), 0.0, glutGet(GLUT_WINDOW_HEIGHT));
 	glMatrixMode(GL_MODELVIEW);
 	glLoadIdentity();
-	glColor3f(1.0f, 1.0f, 1.0f);//needs to be called before RasterPos
+	glColor3f(1.0f, 1.0f, 1.0f);
 	glRasterPos2f(x, y);
 	void * font = GLUT_BITMAP_9_BY_15;
 
 	for (std::string::iterator i = s.begin(); i != s.end(); ++i)
 	{
 		char c = *i;
-		//this does nothing, color is fixed for Bitmaps when calling glRasterPos
-		//glColor3f(1.0, 0.0, 1.0); 
 		glutBitmapCharacter(font, c);
 	}
 	glMatrixMode(GL_PROJECTION);
@@ -187,6 +187,7 @@ void Viewer::draw(GLfloat x, GLfloat y, std::string s)		//Draw text
 	glPopMatrix();
 	glEnable(GL_TEXTURE_2D);
 }
+
 void Viewer::rotation(GLfloat vertical, GLfloat horizontal)
 {
 	if (this->look.checkTheta(vertical * CAMERA_ROTATE_SPEED * M_PI / 180.0))
@@ -196,6 +197,7 @@ void Viewer::rotation(GLfloat vertical, GLfloat horizontal)
 	}
 	this->look.phi += horizontal * CAMERA_ROTATE_SPEED * M_PI / 180.0;
 }
+
 void Viewer::move(ModeDirection direction)
 {
 	Eigen::Vector3f shift(0.0, 0.0, 0.0);
@@ -214,6 +216,7 @@ void Viewer::move(ModeDirection direction)
 	}
 	this->location.set(this->location.getVector() + shift);
 }
+
 void Viewer::moveAroud(GLfloat newX, GLfloat newY)
 {
 	GLfloat horizontal = (this->xClick - newX) / CAMERA_ROTATE_PRE_PIXEL;
@@ -227,6 +230,30 @@ void Viewer::moveAroud(GLfloat newX, GLfloat newY)
 	this->xClick = newX;
 	this->yClick = newY;
 }
+
+void Viewer::screenshot()
+{
+	time_t tt;
+	tm *t;
+	std::stringstream ss;
+	tt = time(NULL);
+	t = localtime(&tt);
+	t->tm_mon += 1;
+	t->tm_year += 1900;
+	ss << t->tm_year;
+	ss << (t->tm_mon > 9) ? "-" : "-0";
+	ss << t->tm_mon;
+	ss << (t->tm_mday > 9) ? "-" : "-0";
+	ss << t->tm_mday;
+	ss << (t->tm_hour > 9) ? "-" : "-0";
+	ss << t->tm_hour;
+	ss << (t->tm_min > 9) ? "-" : "-0";
+	ss << t->tm_min;
+	ss << (t->tm_sec > 9) ? "-" : "-0";
+	ss << t->tm_sec;
+	std::cout << ss.str() << std::endl;
+}
+
 void Viewer::screenshot(std::string fileName)
 {
 	FILE *file;
