@@ -23,63 +23,18 @@ pcl::PolygonMesh triangle;
 std::stringstream fileName;
 
 Viewer *viewer = new Viewer;
+float task = 0.0;
 
 void Mouse(int button, int state, int x, int y);
 void mouseMove(int x, int y);
 void ChangeSize(int w, int h);
+void timer();
 void Display(void);
 void Keyboard(unsigned char key, int x, int y);
 void SpecialKeys(int key, int x, int y);
 void triangulation(pcl::PolygonMesh &triangle, std::string str);
 void poission_surface(pcl::PolygonMesh &poission, std::string str);
-//void poission(const pcl::PCLPointCloud2::ConstPtr &input, pcl::PolygonMesh &output,	int depth, int solver_divide, int iso_divide, float point_weight)
-/*
-void ReadStlModel()
-{
-	//ifstream infile("C:\\Users\\FrankFang\\Desktop\\stl.txt");
-	std::ifstream infile("C:\\Users\\FrankFang\\Desktop\\mode.stl");
-	if (!infile.is_open())
-	{
-		return;
-	}
-	std::string temp, modelname;
 
-	char dump[256];
-	int trinumber = 0;
-	std::vector<std::vector<GLfloat>> tempTriAngle;
-	infile >> temp;
-	int test = temp.compare("solid");
-	if (test != 0)
-	{
-		return;
-	}
-
-	infile.getline(dump, 25);
-	infile >> temp;
-	while (temp.compare("facet") == 0)
-	{
-		trinumber++;//三角形数目
-		infile >> temp;//get rid of "normal "
-		infile >> tempTriAngle.NormDir.x;
-		infile >> tempTriAngle.NormDir.y;
-		infile >> tempTriAngle.NormDir.z;
-
-		infile.getline(dump, 256); infile.getline(dump, 256);//get rid of "outer loop"
-		for (int i = 0; i<3; i++)
-		{
-			infile >> temp;
-			infile >> tempTriAngle.vertex[i].x;
-			infile >> tempTriAngle.vertex[i].y;
-			infile >> tempTriAngle.vertex[i].z;
-			//tempTriAngle.push_back(temppoint[i]);
-		}
-		TrangleVector.push_back(tempTriAngle);
-		infile >> temp;
-		infile >> temp;
-		infile >> temp;
-	}//while()
-}
-*/
 void triangulation(pcl::PolygonMesh &triangle, std::string str)
 {
 	std::stringstream infile, outfile;
@@ -93,7 +48,6 @@ void triangulation(pcl::PolygonMesh &triangle, std::string str)
 		pcl::io::loadPCDFile(&(*infile.str().begin()), cloud_blob);
 		pcl::fromPCLPointCloud2(cloud_blob, *cloud);
 
-
 		pcl::CentroidPoint<pcl::PointXYZ> centroid;
 		pcl::PointXYZ cent;
 		for (size_t i = 0; i < cloud->points.size(); i++)
@@ -101,17 +55,14 @@ void triangulation(pcl::PolygonMesh &triangle, std::string str)
 			centroid.add(cloud->points[i]);
 		}
 		centroid.get(cent);
-		//std::cout << cent << std::endl;
+
 		for (size_t i = 0; i < cloud->points.size(); i++)
 		{
 			cloud->points[i].x -= cent.x;
 			cloud->points[i].y -= cent.y;
 			cloud->points[i].z -= cent.z;
 		}
-		//viewer->Buffer.push(triangle);
-		//* the data should be available in cloud
 
-		// Normal estimation*
 		pcl::NormalEstimation<pcl::PointXYZ, pcl::Normal> n;
 		pcl::PointCloud<pcl::Normal>::Ptr normals(new pcl::PointCloud<pcl::Normal>);
 		pcl::search::KdTree<pcl::PointXYZ>::Ptr tree(new pcl::search::KdTree<pcl::PointXYZ>);
@@ -120,23 +71,17 @@ void triangulation(pcl::PolygonMesh &triangle, std::string str)
 		n.setSearchMethod(tree);
 		n.setKSearch(30);
 		n.compute(*normals);
-		//* normals should not contain the point normals + surface curvatures
 
-		// Concatenate the XYZ and normal fields*
 		pcl::PointCloud<pcl::PointNormal>::Ptr cloud_with_normals(new pcl::PointCloud<pcl::PointNormal>);
 		pcl::concatenateFields(*cloud, *normals, *cloud_with_normals);
-		//* cloud_with_normals = cloud + normals
-		// Create search tree*
+
 		pcl::search::KdTree<pcl::PointNormal>::Ptr tree2(new pcl::search::KdTree<pcl::PointNormal>);
 		tree2->setInputCloud(cloud_with_normals);
 
-		// Initialize objects
 		pcl::GreedyProjectionTriangulation<pcl::PointNormal> gp3;
 
-		// Set the maximum distance between connected points (maximum edge length)
-		gp3.setSearchRadius(50);
+		gp3.setSearchRadius(30);
 
-		// Set typical values for the parameters
 		gp3.setMu(2.5);
 		gp3.setMaximumNearestNeighbors(300);
 		gp3.setMaximumSurfaceAngle(M_PI / 2); // 45 degrees
@@ -144,15 +89,13 @@ void triangulation(pcl::PolygonMesh &triangle, std::string str)
 		gp3.setMaximumAngle(5 * M_PI / 6); // 120 degrees
 		gp3.setNormalConsistency(false);
 
-		// Get result
 		gp3.setInputCloud(cloud_with_normals);
 		gp3.setSearchMethod(tree2);
 		gp3.reconstruct(triangle);
 		pcl::io::savePLYFile(outfile.str(), triangle);
 	}
-
 }
-//void poission(const pcl::PCLPointCloud2::ConstPtr &input, pcl::PolygonMesh &output,int depth, int solver_divide, int iso_divide, float point_weight)
+
 void poission_surface(pcl::PolygonMesh &poission, std::string str)
 {
 	std::stringstream infile, outfile;
@@ -165,7 +108,6 @@ void poission_surface(pcl::PolygonMesh &poission, std::string str)
 		pcl::io::loadPCDFile(&(*infile.str().begin()), cloud_blob);
 		pcl::fromPCLPointCloud2(cloud_blob, *cloud);
 
-
 		pcl::CentroidPoint<pcl::PointXYZ> centroid;
 		pcl::PointXYZ cent;
 		for (size_t i = 0; i < cloud->points.size(); i++)
@@ -173,17 +115,13 @@ void poission_surface(pcl::PolygonMesh &poission, std::string str)
 			centroid.add(cloud->points[i]);
 		}
 		centroid.get(cent);
-		//std::cout << cent << std::endl;
 		for (size_t i = 0; i < cloud->points.size(); i++)
 		{
 			cloud->points[i].x -= cent.x;
 			cloud->points[i].y -= cent.y;
 			cloud->points[i].z -= cent.z;
 		}
-		//viewer->Buffer.push(triangle);
-		//* the data should be available in cloud
 
-		// Normal estimation*
 		pcl::NormalEstimation<pcl::PointXYZ, pcl::Normal> n;
 		pcl::PointCloud<pcl::Normal>::Ptr normals(new pcl::PointCloud<pcl::Normal>);
 		pcl::search::KdTree<pcl::PointXYZ>::Ptr tree(new pcl::search::KdTree<pcl::PointXYZ>);
@@ -192,13 +130,10 @@ void poission_surface(pcl::PolygonMesh &poission, std::string str)
 		n.setSearchMethod(tree);
 		n.setKSearch(30);
 		n.compute(*normals);
-		//* normals should not contain the point normals + surface curvatures
 
-		// Concatenate the XYZ and normal fields*
 		pcl::PointCloud<pcl::PointNormal>::Ptr cloud_with_normals(new pcl::PointCloud<pcl::PointNormal>);
 		pcl::concatenateFields(*cloud, *normals, *cloud_with_normals);
-		//* cloud_with_normals = cloud + normals
-		// Create search tree*
+
 		pcl::search::KdTree<pcl::PointNormal>::Ptr tree2(new pcl::search::KdTree<pcl::PointNormal>);
 		tree2->setInputCloud(cloud_with_normals);
 
@@ -213,45 +148,54 @@ void poission_surface(pcl::PolygonMesh &poission, std::string str)
 		pcl::io::savePLYFile(outfile.str(), poission);
 	}
 }
-void t1()
-{
-	while (1)
-	{
-		std::cout << "thread1" << std::endl;
-		Sleep(1000);
-	}
-}
-int main(int argc, char* argv[])
-{
-	HANDLE thread1;
-	DWORD tID1;
-	thread1 = CreateThread(NULL, 0, (LPTHREAD_START_ROUTINE)t1, 0, 0, &tID1);
-	//pcl::PolygonMesh triangle;
-	//viewer->Buffer.push(triangle);
 
+<<<<<<< HEAD
 	//triangulation(triangle, "../file/75.pcd");
 
 	for (size_t i = 50; i < 100; i += 5)
+=======
+void T_Reconstruct()
+{
+	int min = 50;
+	int max = 100;
+	int step = 5;
+	float total = (float(max - min) / step) * 2;
+	for (size_t i = min; i < max; i += step)
+>>>>>>> master
 	{
 		pcl::PolygonMesh triangle;
 		std::stringstream infile;
 		infile << "../file/";
 		infile << i;
-		triangulation(triangle, infile.str());
-		//poission_surface(triangle, infile.str());
+		//triangulation(triangle, infile.str());
+		poission_surface(triangle, infile.str());
 		viewer->Buffer.push(triangle);
+		task += (1.0 / total);
+		glutPostRedisplay();
 	}
-	for (size_t i = 100; i > 50; i -= 5)
+	for (size_t i = max; i > min; i -= step)
 	{
 		pcl::PolygonMesh triangle;
 		std::stringstream infile;
 		infile << "../file/";
 		infile << i;
-		triangulation(triangle, infile.str());
-		//poission_surface(triangle, infile.str());
+		//triangulation(triangle, infile.str());
+		poission_surface(triangle, infile.str());
 		viewer->Buffer.push(triangle);
+		task += (1.0 / total);
+		glutPostRedisplay();
 	}
-	//////////////////////////////////////////////////////////////////////////////////////////////////////////////
+}
+
+int main(int argc, char* argv[])
+{
+	HANDLE thread1;
+	HANDLE thread2;
+	DWORD tID1;
+	DWORD tID2;
+	thread1 = CreateThread(NULL, 0, (LPTHREAD_START_ROUTINE)T_Reconstruct, 0, 0, &tID1);
+	thread2 = CreateThread(NULL, 0, (LPTHREAD_START_ROUTINE)timer, 0, 0, &tID1);
+	
 	glutInit(&argc, argv);
 	glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB | GLUT_DEPTH);
 	glutInitWindowSize(VIEWER_WIDTH, VIEWER_HEIGHT);
@@ -266,45 +210,86 @@ int main(int argc, char* argv[])
 	glutMainLoop();
 	return 0;
 }
+
+void timer()
+{
+	while (1)
+	{
+		if (viewer->mode == Play)
+		{
+			//if ((clock() - viewer->count) > (1000 / viewer->FPS))
+			{
+				viewer->next = true;
+				viewer->count = clock();
+				glutPostRedisplay();
+			}
+		}
+		Sleep(1000 / viewer->FPS);
+	}
+}
+
 void Display(void)
 {
 	pcl::PolygonMesh temp;
+
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 	glLoadIdentity();
-	glColor3f(1.0, 1.0, 1.0);
-	glLineWidth(1.0);
 
 	gluLookAt(viewer->location.getY(), viewer->location.getZ(), viewer->location.getX(), viewer->location.getY() + viewer->look.getY(), viewer->location.getZ() + viewer->look.getZ(), viewer->location.getX() + viewer->look.getX(), 0.0f, 1.0f, 0.0f);
 
-	if (viewer->mode == Start)
+	if (!viewer->Buffer.empty())
 	{
-		if ((clock() - viewer->count) > (1000 / viewer->FPS))
+		if (viewer->next == true)
 		{
+			viewer->next = false;
 			temp = viewer->Buffer.front();
 			viewer->Buffer.pop();
-			viewer->draw(temp, true);
+			viewer->draw(temp, viewer->fill);
 			viewer->Buffer.push(temp);
-			viewer->count = clock();
 		}
 		else
 		{
-			viewer->draw(viewer->Buffer.back(), true);
+			viewer->draw(viewer->Buffer.front(), viewer->fill);
 		}
-		glutPostRedisplay();
-	}
-	else if (viewer->mode == Stop)
-	{
-		viewer->draw(viewer->Buffer.front(), true);
-		glutPostRedisplay(); 
+		/*
+		if (viewer->mode == Play)
+		{
+			if ((clock() - viewer->count) > (1000 / viewer->FPS))
+			{
+				temp = viewer->Buffer.front();
+				viewer->Buffer.pop();
+				viewer->draw(temp, viewer->fill);
+				viewer->Buffer.push(temp);
+				viewer->count = clock();
+			}
+			else
+			{
+				viewer->draw(viewer->Buffer.back(), viewer->fill);
+			}
+			glutPostRedisplay();
+		}
+		else if (viewer->mode == Pause)
+		{
+			viewer->draw(viewer->Buffer.front(), viewer->fill);
+			glutPostRedisplay();
+		*/
 	}
 	viewer->draw(10, 64, "W S A D : Move camera");
 	viewer->draw(10, 48, "Up Down Left Right : Rotate camera");
 	viewer->draw(10, 32, "Mouse drag : Rotate object");
 	viewer->draw(10, 16, "Mouse scroll : Zoom");
-
+	if (task < 1.0)
+	{
+		std::stringstream ss;
+		ss << "Loading... (";
+		ss << int(task * 100);
+		ss << "%)";
+		viewer->draw(800, 16, ss.str());
+	}
 	glutSwapBuffers();
 }
+
 void ChangeSize(int w, int h)
 {
 	if (h == 0)
@@ -316,10 +301,11 @@ void ChangeSize(int w, int h)
 	glMatrixMode(GL_MODELVIEW);
 	glLoadIdentity();
 	gluLookAt(0.0, 0.0, 5.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0);
+	glColor3f(1.0, 1.0, 1.0);
+	glLineWidth(1.0);
 }
 void Mouse(int button, int state, int x, int y)
 {
-	// only start motion if the left button is pressed
 	switch (button)
 	{
 	case GLUT_LEFT_BUTTON:			//Mouse left buttton
@@ -358,21 +344,23 @@ void Keyboard(unsigned char key, int x, int y)
 	case 's':	viewer->move(Backward);	break;
 	case 'a':	viewer->move(Left);		break;
 	case 'd':	viewer->move(Right);	break;
+	case 't':	viewer->screenshot();			break;
 	case 'f':
 		viewer->look.theta = M_PI - viewer->location.theta;
 		viewer->look.phi = viewer->location.phi + M_PI;
 		break;
-		//case '1':   viewer->mode == Start;  break;
-		//case '2':   viewer->mode == Stop;   break;
-	case 32:
-		if (viewer->mode == Start)
-			viewer->mode = Stop;
+	case 'l':	viewer->fill = !viewer->fill;	break;
+	case 32:		// space
+		if (viewer->mode == Play)
+			viewer->mode = Pause;
 		else
-			viewer->mode = Start;
+			if (task >= 1.0)
+			{
+				std::cout << "AAAAAAAAAAAAAAAAAAAAA" << std::endl;
+				viewer->mode = Play;
+			}
 		break;
-
 	default:	printf("   Keyboard %c == %d\n", key, key);	break;
-
 	}
 	glutPostRedisplay();
 }
