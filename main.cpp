@@ -23,10 +23,12 @@ pcl::PolygonMesh triangle;
 std::stringstream fileName;
 
 Viewer *viewer = new Viewer;
+float task = 0.0;
 
 void Mouse(int button, int state, int x, int y);
 void mouseMove(int x, int y);
 void ChangeSize(int w, int h);
+void timer();
 void Display(void);
 void Keyboard(unsigned char key, int x, int y);
 void SpecialKeys(int key, int x, int y);
@@ -147,29 +149,47 @@ void poission_surface(pcl::PolygonMesh &poission, std::string str)
 	}
 }
 
+void T_Reconstruct()
+{
+	int min = 50;
+	int max = 100;
+	int step = 5;
+	float total = (float(max - min) / step) * 2;
+	for (size_t i = min; i < max; i += step)
+	{
+		pcl::PolygonMesh triangle;
+		std::stringstream infile;
+		infile << "../file/";
+		infile << i;
+		//triangulation(triangle, infile.str());
+		poission_surface(triangle, infile.str());
+		viewer->Buffer.push(triangle);
+		task += (1.0 / total);
+		glutPostRedisplay();
+	}
+	for (size_t i = max; i > min; i -= step)
+	{
+		pcl::PolygonMesh triangle;
+		std::stringstream infile;
+		infile << "../file/";
+		infile << i;
+		//triangulation(triangle, infile.str());
+		poission_surface(triangle, infile.str());
+		viewer->Buffer.push(triangle);
+		task += (1.0 / total);
+		glutPostRedisplay();
+	}
+}
+
 int main(int argc, char* argv[])
 {
-	for (size_t i = 50; i < 100; i += 5)
-	{
-		pcl::PolygonMesh triangle;
-		std::stringstream infile;
-		infile << "../file/";
-		infile << i;
-		//triangulation(triangle, infile.str());
-		poission_surface(triangle, infile.str());
-		viewer->Buffer.push(triangle);
-	}
-	for (size_t i = 100; i > 50; i -= 5)
-	{
-		pcl::PolygonMesh triangle;
-		std::stringstream infile;
-		infile << "../file/";
-		infile << i;
-		//triangulation(triangle, infile.str());
-		poission_surface(triangle, infile.str());
-		viewer->Buffer.push(triangle);
-	}
-
+	HANDLE thread1;
+	HANDLE thread2;
+	DWORD tID1;
+	DWORD tID2;
+	thread1 = CreateThread(NULL, 0, (LPTHREAD_START_ROUTINE)T_Reconstruct, 0, 0, &tID1);
+	thread2 = CreateThread(NULL, 0, (LPTHREAD_START_ROUTINE)timer, 0, 0, &tID1);
+	
 	glutInit(&argc, argv);
 	glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB | GLUT_DEPTH);
 	glutInitWindowSize(VIEWER_WIDTH, VIEWER_HEIGHT);
@@ -184,39 +204,86 @@ int main(int argc, char* argv[])
 	glutMainLoop();
 	return 0;
 }
-BOOL test = false;
+
+void timer()
+{
+	while (1)
+	{
+		if (viewer->mode == Play)
+		{
+			//if ((clock() - viewer->count) > (1000 / viewer->FPS))
+			{
+				viewer->next = true;
+				viewer->count = clock();
+				glutPostRedisplay();
+			}
+		}
+		Sleep(1000 / viewer->FPS);
+	}
+}
+
 void Display(void)
 {
 	pcl::PolygonMesh temp;
+
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 	glLoadIdentity();
-	
+
 	gluLookAt(viewer->location.getY(), viewer->location.getZ(), viewer->location.getX(), viewer->location.getY() + viewer->look.getY(), viewer->location.getZ() + viewer->look.getZ(), viewer->location.getX() + viewer->look.getX(), 0.0f, 1.0f, 0.0f);
 
-	if (viewer->mode == Play)
+	if (!viewer->Buffer.empty())
 	{
-		if ((clock() - viewer->count) > (1000 / viewer->FPS))
+		if (viewer->next == true)
 		{
+			viewer->next = false;
 			temp = viewer->Buffer.front();
 			viewer->Buffer.pop();
 			viewer->draw(temp, viewer->fill);
 			viewer->Buffer.push(temp);
-			viewer->count = clock();
 		}
 		else
 		{
-			viewer->draw(viewer->Buffer.back(), viewer->fill);
+			viewer->draw(viewer->Buffer.front(), viewer->fill);
 		}
-		glutPostRedisplay();
+		/*
+		if (viewer->mode == Play)
+		{
+			if ((clock() - viewer->count) > (1000 / viewer->FPS))
+			{
+				temp = viewer->Buffer.front();
+				viewer->Buffer.pop();
+				viewer->draw(temp, viewer->fill);
+				viewer->Buffer.push(temp);
+				viewer->count = clock();
+			}
+			else
+			{
+				viewer->draw(viewer->Buffer.back(), viewer->fill);
+			}
+			glutPostRedisplay();
+		}
+		else if (viewer->mode == Pause)
+		{
+			viewer->draw(viewer->Buffer.front(), viewer->fill);
+			glutPostRedisplay();
+		*/
 	}
-	else if (viewer->mode == Pause)
+	viewer->draw(10, 64, "W S A D : Move camera");
+	viewer->draw(10, 48, "Up Down Left Right : Rotate camera");
+	viewer->draw(10, 32, "Mouse drag : Rotate object");
+	viewer->draw(10, 16, "Mouse scroll : Zoom");
+	if (task < 1.0)
 	{
-		viewer->draw(viewer->Buffer.front(), viewer->fill);
-		glutPostRedisplay();
+		std::stringstream ss;
+		ss << "Loading... (";
+		ss << int(task * 100);
+		ss << "%)";
+		viewer->draw(800, 16, ss.str());
 	}
 	glutSwapBuffers();
 }
+
 void ChangeSize(int w, int h)
 {
 	if (h == 0)
@@ -230,10 +297,6 @@ void ChangeSize(int w, int h)
 	gluLookAt(0.0, 0.0, 5.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0);
 	glColor3f(1.0, 1.0, 1.0);
 	glLineWidth(1.0);
-	viewer->draw(10, 64, "W S A D : Move camera");
-	viewer->draw(10, 48, "Up Down Left Right : Rotate camera");
-	viewer->draw(10, 32, "Mouse drag : Rotate object");
-	viewer->draw(10, 16, "Mouse scroll : Zoom");
 }
 void Mouse(int button, int state, int x, int y)
 {
@@ -285,7 +348,11 @@ void Keyboard(unsigned char key, int x, int y)
 		if (viewer->mode == Play)
 			viewer->mode = Pause;
 		else
-			viewer->mode = Play;
+			if (task >= 1.0)
+			{
+				std::cout << "AAAAAAAAAAAAAAAAAAAAA" << std::endl;
+				viewer->mode = Play;
+			}
 		break;
 	default:	printf("   Keyboard %c == %d\n", key, key);	break;
 	}
