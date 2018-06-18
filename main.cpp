@@ -230,12 +230,8 @@ int main(int argc, char* argv[])
 	//viewer->Buffer.push(triangle);
 
 	//triangulation(triangle, "../file/75.pcd");
-<<<<<<< HEAD
 
-	for (size_t i = 50; i < 55; i += 5)
-=======
 	for (size_t i = 50; i < 100; i += 5)
->>>>>>> XIAO
 	{
 		pcl::PolygonMesh triangle;
 		std::stringstream infile;
@@ -245,12 +241,7 @@ int main(int argc, char* argv[])
 		//poission_surface(triangle, infile.str());
 		viewer->Buffer.push(triangle);
 	}
-<<<<<<< HEAD
-/*
-	for (size_t i = 70; i >= 50; i -= 5)
-=======
 	for (size_t i = 100; i > 50; i -= 5)
->>>>>>> XIAO
 	{
 		pcl::PolygonMesh triangle;
 		std::stringstream infile;
@@ -298,11 +289,7 @@ void Display(void)
 		}
 		else
 		{
-<<<<<<< HEAD
-			viewer->draw(viewer->Buffer.back(), false);
-=======
 			viewer->draw(viewer->Buffer.back(), true);
->>>>>>> XIAO
 		}
 		glutPostRedisplay();
 	}
