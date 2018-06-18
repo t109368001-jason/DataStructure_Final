@@ -17,10 +17,10 @@ Viewer::Viewer()
 	this->look.radius = CAMERA_MOVE_SPEED;
 	this->look.theta = M_PI_2;
 	this->look.phi = M_PI;
-	this->mode = Play;
+	this->mode = Pause;
 	this->FPS = 30;
 	this->count = 0;
-	this->fill = false;
+	this->fill = true;
 }
 
 void Viewer::draw(pcl::PCLPointCloud2 cloud2)		//Draw pointClouds

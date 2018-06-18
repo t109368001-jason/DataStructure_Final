@@ -27,6 +27,7 @@ public:
 	GLfloat FPS;
 	PlayMode mode;
 	BOOL fill;
+	BOOL next;
 	std::queue<pcl::PolygonMesh> Buffer;
 	Viewer();
 	void Viewer::draw(pcl::PCLPointCloud2 cloud2);		// Draw point cloud
@@ -37,5 +38,6 @@ public:
 	void moveAroud(GLfloat theta, GLfloat phi);
 	void screenshot();
 	void screenshot(std::string fileName);
+	void timer();
 };
 #endif // VIEWER_H
