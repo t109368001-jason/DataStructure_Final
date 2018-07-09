@@ -4,12 +4,6 @@
     <ClCompile Include="C:\Users\wesdx\OneDrive\Documents\c\DataStructure_Final\main.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\include\sphere.cpp">
-      <Filter>include</Filter>
-    </ClCompile>
-    <ClCompile Include="..\include\viewer.cpp">
-      <Filter>include</Filter>
-    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="C:\Users\wesdx\OneDrive\Documents\c\DataStructure_Final\CMakeLists.txt" />

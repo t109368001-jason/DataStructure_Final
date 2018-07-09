@@ -24,6 +24,7 @@ std::stringstream fileName;
 
 Viewer *viewer = new Viewer;
 float task = 0.0;
+BOOL tri = true;
 
 void Mouse(int button, int state, int x, int y);
 void mouseMove(int x, int y);
@@ -149,7 +150,7 @@ void poission_surface(pcl::PolygonMesh &poission, std::string str)
 	}
 }
 
-void T_Reconstruct()
+void Test_Reconstruct()
 {
 	int min = 50;
 	int max = 100;
@@ -161,8 +162,14 @@ void T_Reconstruct()
 		std::stringstream infile;
 		infile << "../file/";
 		infile << i;
-		//triangulation(triangle, infile.str());
-		poission_surface(triangle, infile.str());
+		if (tri)
+		{
+			triangulation(triangle, infile.str());
+		}
+		else
+		{
+			poission_surface(triangle, infile.str());
+		}
 		viewer->Buffer.push(triangle);
 		task += (1.0 / total);
 		glutPostRedisplay();
@@ -173,23 +180,42 @@ void T_Reconstruct()
 		std::stringstream infile;
 		infile << "../file/";
 		infile << i;
-		//triangulation(triangle, infile.str());
-		poission_surface(triangle, infile.str());
+		if (tri)
+		{
+			triangulation(triangle, infile.str());
+		}
+		else
+		{
+			poission_surface(triangle, infile.str());
+		}
 		viewer->Buffer.push(triangle);
 		task += (1.0 / total);
 		glutPostRedisplay();
 	}
+	viewer->mode = Play;
 }
 
 int main(int argc, char* argv[])
 {
 	HANDLE thread1;
-	HANDLE thread2;
 	DWORD tID1;
-	DWORD tID2;
-	thread1 = CreateThread(NULL, 0, (LPTHREAD_START_ROUTINE)T_Reconstruct, 0, 0, &tID1);
-	thread2 = CreateThread(NULL, 0, (LPTHREAD_START_ROUTINE)timer, 0, 0, &tID1);
-	
+	char choice;
+
+	std::cout << "Select surface : (t)triangulation / (p)poission\n: ";
+	while (std::cin >> choice)
+	{
+		if ((choice == 't') || (choice == 'T'))
+		{
+			tri = true;
+			break;
+		}
+		else if ((choice == 'p') || (choice == 'P'))
+		{
+			tri = false;
+			break;
+		}
+	}
+
 	glutInit(&argc, argv);
 	glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB | GLUT_DEPTH);
 	glutInitWindowSize(VIEWER_WIDTH, VIEWER_HEIGHT);
@@ -199,27 +225,13 @@ int main(int argc, char* argv[])
 	glutMouseFunc(Mouse);
 	glutMotionFunc(mouseMove);
 	glutSpecialFunc(SpecialKeys);
+
+	thread1 = CreateThread(NULL, 0, (LPTHREAD_START_ROUTINE)Test_Reconstruct, 0, 0, &tID1);
+	
 	glutDisplayFunc(Display);
 
 	glutMainLoop();
 	return 0;
-}
-
-void timer()
-{
-	while (1)
-	{
-		if (viewer->mode == Play)
-		{
-			//if ((clock() - viewer->count) > (1000 / viewer->FPS))
-			{
-				viewer->next = true;
-				viewer->count = clock();
-				glutPostRedisplay();
-			}
-		}
-		Sleep(1000 / viewer->FPS);
-	}
 }
 
 void Display(void)
@@ -234,19 +246,6 @@ void Display(void)
 
 	if (!viewer->Buffer.empty())
 	{
-		if (viewer->next == true)
-		{
-			viewer->next = false;
-			temp = viewer->Buffer.front();
-			viewer->Buffer.pop();
-			viewer->draw(temp, viewer->fill);
-			viewer->Buffer.push(temp);
-		}
-		else
-		{
-			viewer->draw(viewer->Buffer.front(), viewer->fill);
-		}
-		/*
 		if (viewer->mode == Play)
 		{
 			if ((clock() - viewer->count) > (1000 / viewer->FPS))
@@ -267,12 +266,15 @@ void Display(void)
 		{
 			viewer->draw(viewer->Buffer.front(), viewer->fill);
 			glutPostRedisplay();
-		*/
+		}
 	}
-	viewer->draw(10, 64, "W S A D : Move camera");
-	viewer->draw(10, 48, "Up Down Left Right : Rotate camera");
-	viewer->draw(10, 32, "Mouse drag : Rotate object");
-	viewer->draw(10, 16, "Mouse scroll : Zoom");
+	viewer->draw(10, 16 * 6, "p : Point / mesh");
+	viewer->draw(10, 16 * 6, "L : Unsoild / Solid");
+	viewer->draw(10, 16 * 5, "W S : Move camera");
+	viewer->draw(10, 16 * 4, "Space : Play / Pause");
+	viewer->draw(10, 16 * 3, "Mouse drag : Rotate object");
+	viewer->draw(10, 16 * 2, "Mouse scroll : Zoom");
+	viewer->draw(10, 16 * 1, "Up Down Left Right : Rotate camera");
 	if (task < 1.0)
 	{
 		std::stringstream ss;
@@ -334,23 +336,31 @@ void Keyboard(unsigned char key, int x, int y)
 	GLfloat fraction = CAMERA_MOVE_SPEED;
 	switch (key)
 	{
-	case 'w':	viewer->move(Forward);	break;
-	case 's':	viewer->move(Backward);	break;
-	case 'a':	viewer->move(Left);		break;
-	case 'd':	viewer->move(Right);	break;
-	case 't':	viewer->screenshot();			break;
+	case 'w':
+	case 'W':	viewer->move(Forward);	break;
+	case 's':
+	case 'S':	viewer->move(Backward);	break;
+	case 'a':
+	case 'A':	viewer->move(Left);		break;
+	case 'd':
+	case 'D':	viewer->move(Right);	break;
+	case 't':
+	case 'T':	viewer->screenshot();			break;
 	case 'f':
+	case 'F':
 		viewer->look.theta = M_PI - viewer->location.theta;
 		viewer->look.phi = viewer->location.phi + M_PI;
 		break;
-	case 'l':	viewer->fill = !viewer->fill;	break;
+	case 'l':
+	case 'L':	viewer->fill = !viewer->fill;	break;
+	case 'p':
+	case 'P':	viewer->reconstruct = !viewer->reconstruct;	break;
 	case 32:		// space
 		if (viewer->mode == Play)
 			viewer->mode = Pause;
 		else
 			if (task >= 1.0)
 			{
-				std::cout << "AAAAAAAAAAAAAAAAAAAAA" << std::endl;
 				viewer->mode = Play;
 			}
 		break;

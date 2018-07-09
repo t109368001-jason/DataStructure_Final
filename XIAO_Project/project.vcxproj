@@ -309,8 +309,6 @@ if %errorlevel% neq 0 goto :VCEnd</Command>
     </CustomBuild>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\include\sphere.cpp" />
-    <ClCompile Include="..\include\viewer.cpp" />
     <ClCompile Include="C:\Users\wesdx\OneDrive\Documents\c\DataStructure_Final\main.cpp" />
   </ItemGroup>
   <ItemGroup>

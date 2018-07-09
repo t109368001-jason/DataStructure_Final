@@ -1,20 +1,4 @@
-#ifndef VIEWER_H  
-#define VIEWER_H  
-
-#include <pcl/point_types.h>
-#include <pcl/surface/gp3.h>
-#include <pcl/common/centroid.h>
-#include <gl/glut.h>
-#include <time.h>
-#include "sphere.h"
-
-#define CAMERA_MOVE_SPEED		0.05f
-#define CAMERA_ROTATE_SPEED		10.0f
-#define CAMERA_ROTATE_PRE_PIXEL	50.0f
-
-enum ModeDirection { Forward, Backward, Left, Right };
-
-enum PlayMode { Play, Pause };
+#include "viewer.h"
 
 struct triangle
 {
@@ -24,33 +8,6 @@ struct triangle
 };
 
 bool compFunc(triangle &a, triangle &b) { return a.distanse > b.distanse; }
-
-class Viewer
-{
-public:
-	clock_t count;
-	Sphere location;
-	Sphere look;
-	GLfloat xClick;
-	GLfloat yClick;
-	GLfloat FPS;
-	PlayMode mode;
-	BOOL fill;
-	BOOL next;
-	BOOL reconstruct;
-	std::queue<pcl::PolygonMesh> Buffer;
-	Viewer();
-	void draw(pcl::PolygonMesh &mesh, BOOL fill, BOOL reconstruct);							// Draw
-	void draw(pcl::PCLPointCloud2 cloud2);		// Draw point cloud
-	void draw(pcl::PolygonMesh &mesh, BOOL fill);							// Draw mesh
-	void draw(GLfloat x, GLfloat y, std::string s);				// Draw caption
-	void rotation(GLfloat theta, GLfloat phi);
-	void move(ModeDirection direction);
-	void moveAroud(GLfloat theta, GLfloat phi);
-	void screenshot();
-	void screenshot(std::string fileName);
-	void timer();
-};
 
 Viewer::Viewer()
 {
@@ -160,48 +117,48 @@ void Viewer::draw(pcl::PolygonMesh &mesh, BOOL fill)		//Draw mesh
 		/*
 		for (size_t i = 0; i < mesh.polygons.size(); i++)
 		{
-		Eigen::Vector3f line1 = cloud->points[mesh.polygons[i].vertices[0]].getVector3fMap() - cloud->points[mesh.polygons[i].vertices[1]].getVector3fMap();
-		Eigen::Vector3f line2 = cloud->points[mesh.polygons[i].vertices[1]].getVector3fMap() - cloud->points[mesh.polygons[i].vertices[2]].getVector3fMap();
-		Eigen::Vector3f n = line1.cross(line2);
-		Eigen::Vector3f light(-1.0, 0.0, 0.0);
-		Eigen::Vector3f loc(this->location.getY(), this->location.getZ(), this->location.getX());
-		GLfloat theta;
+			Eigen::Vector3f line1 = cloud->points[mesh.polygons[i].vertices[0]].getVector3fMap() - cloud->points[mesh.polygons[i].vertices[1]].getVector3fMap();
+			Eigen::Vector3f line2 = cloud->points[mesh.polygons[i].vertices[1]].getVector3fMap() - cloud->points[mesh.polygons[i].vertices[2]].getVector3fMap();
+			Eigen::Vector3f n = line1.cross(line2);
+			Eigen::Vector3f light(-1.0, 0.0, 0.0);
+			Eigen::Vector3f loc(this->location.getY(), this->location.getZ(), this->location.getX());
+			GLfloat theta;
 
-		loc -= cloud->points[mesh.polygons[i].vertices[0]].getVector3fMap();
-		if (acos(n.dot(cloud->points[mesh.polygons[i].vertices[0]].getVector3fMap()) / n.norm() / cloud->points[mesh.polygons[i].vertices[0]].getVector3fMap().norm()) >= M_PI_2)
-		{
-		n *= -1;
-		}
-		if (acos(n.dot(loc) / n.norm() / loc.norm()) <= M_PI_2)
-		{
-		theta = acos(n.dot(light) / n.norm() / light.norm());
-		glColor3f(theta / M_PI, theta / M_PI, theta / M_PI);
-		if (mesh.polygons[i].vertices.size() == 3)
-		{
-		glBegin(GL_TRIANGLES);
-		for (size_t j = 0; j < mesh.polygons[i].vertices.size(); j++)
-		glVertex3f(cloud->points[mesh.polygons[i].vertices[j]].x, cloud->points[mesh.polygons[i].vertices[j]].y, cloud->points[mesh.polygons[i].vertices[j]].z);
-		glEnd();
-		}
-		else if (mesh.polygons[i].vertices.size() == 4)
-		{
-		glBegin(GL_QUADS);
-		for (size_t j = 0; j < mesh.polygons[i].vertices.size(); j++)
-		glVertex3f(cloud->points[mesh.polygons[i].vertices[j]].x, cloud->points[mesh.polygons[i].vertices[j]].y, cloud->points[mesh.polygons[i].vertices[j]].z);
-		glEnd();
-		}
-		else
-		{
-		glBegin(GL_LINES);
-		for (size_t j = 0; j < mesh.polygons[i].vertices.size(); j++)
-		glVertex3f(cloud->points[mesh.polygons[i].vertices[j]].x, cloud->points[mesh.polygons[i].vertices[j]].y, cloud->points[mesh.polygons[i].vertices[j]].z);
-		glVertex3f(cloud->points[mesh.polygons[i].vertices[0]].x, cloud->points[mesh.polygons[i].vertices[0]].y, cloud->points[mesh.polygons[i].vertices[0]].z);
-		glEnd();
-		}
-		}
+			loc -= cloud->points[mesh.polygons[i].vertices[0]].getVector3fMap();
+			if (acos(n.dot(cloud->points[mesh.polygons[i].vertices[0]].getVector3fMap()) / n.norm() / cloud->points[mesh.polygons[i].vertices[0]].getVector3fMap().norm()) >= M_PI_2)
+			{
+				n *= -1;
+			}
+			if (acos(n.dot(loc) / n.norm() / loc.norm()) <= M_PI_2)
+			{
+				theta = acos(n.dot(light) / n.norm() / light.norm());
+				glColor3f(theta / M_PI, theta / M_PI, theta / M_PI);
+				if (mesh.polygons[i].vertices.size() == 3)
+				{
+					glBegin(GL_TRIANGLES);
+					for (size_t j = 0; j < mesh.polygons[i].vertices.size(); j++)
+						glVertex3f(cloud->points[mesh.polygons[i].vertices[j]].x, cloud->points[mesh.polygons[i].vertices[j]].y, cloud->points[mesh.polygons[i].vertices[j]].z);
+					glEnd();
+				}
+				else if (mesh.polygons[i].vertices.size() == 4)
+				{
+					glBegin(GL_QUADS);
+					for (size_t j = 0; j < mesh.polygons[i].vertices.size(); j++)
+						glVertex3f(cloud->points[mesh.polygons[i].vertices[j]].x, cloud->points[mesh.polygons[i].vertices[j]].y, cloud->points[mesh.polygons[i].vertices[j]].z);
+					glEnd();
+				}
+				else
+				{
+					glBegin(GL_LINES);
+					for (size_t j = 0; j < mesh.polygons[i].vertices.size(); j++)
+						glVertex3f(cloud->points[mesh.polygons[i].vertices[j]].x, cloud->points[mesh.polygons[i].vertices[j]].y, cloud->points[mesh.polygons[i].vertices[j]].z);
+					glVertex3f(cloud->points[mesh.polygons[i].vertices[0]].x, cloud->points[mesh.polygons[i].vertices[0]].y, cloud->points[mesh.polygons[i].vertices[0]].z);
+					glEnd();
+				}
+			}
 		*/
 	}
-	else if ((!fill) && (mesh.polygons.size() > 1))
+	else if((!fill) && (mesh.polygons.size() > 1))
 	{
 		for (size_t i = 0; i < mesh.polygons.size(); i++)
 		{
@@ -212,7 +169,7 @@ void Viewer::draw(pcl::PolygonMesh &mesh, BOOL fill)		//Draw mesh
 			glEnd();
 		}
 	}
-	else if (mesh.polygons.size() > 0)
+	else if(mesh.polygons.size() > 0)
 	{
 		this->draw(mesh.cloud);
 	}
@@ -355,4 +312,3 @@ void Viewer::screenshot(std::string fileName)
 	free(data);
 	fclose(file);
 }
-#endif // VIEWER_H
